@@ -1,10 +1,4 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" CompilerVersion="v4.0" OutputType="None" %>
-<%@ Property Name="ProjectName" Type="System.String" Category="Context" Default="ElementPs"  %>
-<%@ Property Name="CompanyName" Type="System.String" Category="Context" Default="Element PS"  %>
-<%@ Property Name="SourceDatabase" Type="SchemaExplorer.DatabaseSchema" Category="Context" Default="PetShop"  %>
-<%@ Property Name="CurrentTable" Type="SchemaExplorer.TableSchema" Category="Context" Optional="True" %>
-<%@ Property Name="OutputDirectory" Type="System.String" Category="Output" Description="The name of the actual database server that is being documented." Default="D:\VentoGenOut" %>
-<%@ Property Name="ProjectGuids" Type="System.Collections.Generic.Dictionary<System.String, System.Guid>" Category="Output" Optional="True" %>
 <%@ Register Name="EngineMasterTemplate" Template="Engine\EngineMaster.cst" %>
 <%@ Register Name="WebApiMasterTemplate" Template="WebApi\WebApiMaster.cst" %>
 <%@ Register Name="ClientMasterTemplate" Template="Client\ClientMaster.cst" %>
@@ -25,34 +19,47 @@ private int _totalTableCount = 0;
 
 public override void Render(TextWriter writer)
 {
+    if (!File.Exists(Path.Combine(string.Format(Path.Combine(this.OutputDirectory, this.SolutionName, "{0}.sln"), this.SolutionName))))
+    {        
+        this.CreateProjectFiles = true;
+    }
+    
     this.ClearDirectory(this.OutputDirectory);
     
-    List<string> projects = new List<string>() { "Client", "WebApi", "Engine" };
-  
+    this.ProjectAliases  = new System.Collections.Generic.Dictionary<string,string>(){
+             {"Engine","Engine"},
+             {"Client","Client"},
+             {"WebApi","WebApi"},
+           };
+    
     this.ProjectGuids = new System.Collections.Generic.Dictionary<System.String, System.Guid>();
-    foreach (var name in projects)
+    
+    foreach (var key in this.ProjectAliases.Keys)
 	{
-		  ProjectGuids.Add(name, Guid.NewGuid());       
+		   ProjectGuids.Add(key, Guid.NewGuid());    
 	}
     
-    var solutionTemplate = this.Create<SolutionTemplate>();
-    this.CopyPropertiesTo(solutionTemplate);
-    solutionTemplate.RenderToFile(string.Format(Path.Combine(this.OutputDirectory,this.ProjectName,"{0}.sln"), this.ProjectName), true);
-    
+    if (this.CreateProjectFiles) 
+    {
+        var solutionTemplate = this.Create<SolutionTemplate>();
+        this.CopyPropertiesTo(solutionTemplate);
+        solutionTemplate.RenderToFile(string.Format(Path.Combine(this.OutputDirectory, this.SolutionName, "{0}.sln"), this.SolutionName), true);    
+    }
+        
     var engineMaster = this.Create<EngineMasterTemplate>();
     this.CopyPropertiesTo(engineMaster);   
+    engineMaster.ProjectName = "Engine";
     engineMaster.RenderToString();
     
     var webApiMaster = this.Create<WebApiMasterTemplate>();
     this.CopyPropertiesTo(webApiMaster);
+    webApiMaster.ProjectName = "WebApi";
     webApiMaster.RenderToString();
     
     var clientMaster = this.Create<ClientMasterTemplate>();
     this.CopyPropertiesTo(clientMaster);
+    clientMaster.ProjectName = "Client";
     clientMaster.RenderToString();
-    
-
-         
 }
 
 public void OnProgress(object sender, ProgressEventArgs e)

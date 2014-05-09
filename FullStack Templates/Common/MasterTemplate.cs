@@ -17,27 +17,28 @@ namespace FullStack.Common
 {
     public class MasterTemplate : CodeTemplate
     {
-    	// Number of columns that should be displayed on the summary lists.
-    	public const int NUM_OF_COLUMNS = 3;
-    	
-    	private string _outputDirectory = String.Empty;
-    	
-        /*
-        <%@ Map Name="SqlCSharp" Src="Sql-CSharp" Description="System to C# Type Map" %>
-    <%@ Map Name="DbDataReader" Src="DbType-DataReaderMethod" Description="DbType to DataReader Method Map" %>
-    <%@ Map Name="SqlNativeSqlDb" Src="SqlNativeType-SqlDbType" Description="SqlNativeType to SqlDbType Map" %>
-    <%@ Map Name="DbTypeCSharp" Src="DbType-CSharp" Description="DbType to CSharp Map" %>
-        */
-        public MapCollection SqlCSharp = Map.LoadFromName("Sql-CSharp"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
-        public MapCollection DbDataReader = Map.LoadFromName("DbType-DataReaderMethod"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
-        public MapCollection SqlNativeSqlDb = Map.LoadFromName("SqlNativeType-SqlDbType"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
-        public MapCollection DbTypeCSharp = Map.LoadFromName("DbType-CSharp"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
+        [Optional]
+        [Category("Context")]
+    	public string ProjectName { get; set; }
         
-    	public MasterTemplate() : base()
-    	{
-    	}
-    	  
-    	[Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
+        [Category("Context")]
+        public string SolutionName { get; set;}
+        
+        [Category("Context")]
+        public string CompanyName { get; set;}
+        
+        [Category("Context")]
+        public SchemaExplorer.DatabaseSchema SourceDatabase { get; set;}
+       
+        [Optional]
+        [Category("Context")]
+    	 public SchemaExplorer.TableSchema CurrentTable { get; set;}
+        
+         [Optional]
+         [Category("Context")]
+    	 public System.Collections.Generic.Dictionary<System.String, System.Guid> ProjectGuids { get;set; }
+    	
+        [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
     	[Optional]
     	[Category("Output")]
     	[Description("The directory to output the results to.")]
@@ -59,6 +60,37 @@ namespace FullStack.Common
     		} 
     	}
     	
+         
+        [Optional]
+    	public System.Collections.Generic.Dictionary<string,string> ProjectAliases { get; set; }
+         
+        
+        [Category("Context")]
+        [DefaultValue(true)]
+        [Description("If set to true then the .sln and .csproj files will be created")]
+    	 public bool CreateProjectFiles { get; set;}
+        
+         public const int NUM_OF_COLUMNS = 3;
+    	
+    	private string _outputDirectory = String.Empty;
+    	
+        /*
+        <%@ Map Name="SqlCSharp" Src="Sql-CSharp" Description="System to C# Type Map" %>
+    <%@ Map Name="DbDataReader" Src="DbType-DataReaderMethod" Description="DbType to DataReader Method Map" %>
+    <%@ Map Name="SqlNativeSqlDb" Src="SqlNativeType-SqlDbType" Description="SqlNativeType to SqlDbType Map" %>
+    <%@ Map Name="DbTypeCSharp" Src="DbType-CSharp" Description="DbType to CSharp Map" %>
+        */
+        public MapCollection SqlCSharp = Map.LoadFromName("Sql-CSharp"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
+        public MapCollection DbDataReader = Map.LoadFromName("DbType-DataReaderMethod"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
+        public MapCollection SqlNativeSqlDb = Map.LoadFromName("SqlNativeType-SqlDbType"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
+        public MapCollection DbTypeCSharp = Map.LoadFromName("DbType-CSharp"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
+        
+    	public MasterTemplate() : base()
+    	{
+    	}
+    	  
+        public string CurrentProjectAlias { get { return ProjectAliases[ProjectName]; }}
+        
     	public void OutputTemplate(CodeTemplate template)
     	{
     		this.CopyPropertiesTo(template);
@@ -74,6 +106,11 @@ namespace FullStack.Common
             }
             else
             {
+                if (CreateProjectFiles)
+                {
+                    this.DeleteFiles(path, "*.sln");
+                    this.DeleteFiles(path, "*.csproj");
+                }
                 // Clean up the existing output directory.
                 this.DeleteFiles(path, "*.cs");
             }    
@@ -428,7 +465,7 @@ namespace FullStack.Common
                 throw new Exception(string.Format("Unable to find an ItemGroup to add the file {1} to the {0} project", projectPath, file));
 
             //If the file is already listed, don't bother adding it again
-            if(itemGroup.Descendants(ns + "Compile").Where(x=>x.Attribute("Include").Value.ToString() == file).Count() > 0)
+            if(itemGroup.Descendants(ns + "Compile").Where(x=>x.Attribute("Include").Value.ToString() == Path.Combine(projectSubDir,file)).Count() > 0)
                 return; 
 
             XElement item = new XElement(ns + "Compile", 

@@ -1,7 +1,4 @@
-﻿<%@ Template Language="C#" TargetLanguage="Text" %>
-<%@ Property Name="CompanyName" Type="System.String" %>
-<%@ Property Name="ProjectName" Type="System.String" %>
-<%@ Property Name="SubProjectName" Type="System.String" %>
+﻿<%@ Template Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" %>
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -9,11 +6,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("<%= ProjectName %>.<%= SubProjectName %>")]
+[assembly: AssemblyTitle("<%= SolutionName %>.<%= CurrentProjectAlias %>")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("<% = CompanyName %>")]
-[assembly: AssemblyProduct("<%= ProjectName %>")]
+[assembly: AssemblyProduct("<%= SolutionName %>")]
 [assembly: AssemblyCopyright("Copyright © <% = CompanyName %> <%= System.DateTime.Now.Year %>")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

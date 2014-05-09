@@ -1,8 +1,4 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
-<%@ Property Name="ProjectName" Type="System.String" Category="Context" Description="Database that the documentation should be based on." %>
-<%@ Property Name="SourceDatabase" Type="SchemaExplorer.DatabaseSchema" Category="Context" Description="Database that the documentation should be based on." %>
-<%@ Property Name="CurrentTable" Type="SchemaExplorer.TableSchema" Category="Context" Description="Database that the documentation should be based on." %>
-<%@ Property Name="OutputDirectory" Type="System.String" Category="Output" Description="The name of the actual database server that is being documented." %>
 <%@ Assembly Name="SchemaExplorer" %>
 <%@ Assembly Name="System.Design" %>
 <%@ Assembly Name="System.Linq" %>
@@ -10,8 +6,10 @@
 <%@ Import Namespace="SchemaExplorer" %>
 <%@ Import NameSpace="System.IO" %>
 <%@ Import Namespace="System.Data" %>
-namespace <%= this.ProjectName %>.Client.Models
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models
 {
+    using System;
+    
     internal partial class <%= this.GetModelClassName(CurrentTable) %>
     {
         #region Public Properties

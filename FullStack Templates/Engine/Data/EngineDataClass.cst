@@ -1,22 +1,17 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
-<%@ Property Name="ProjectName" Type="System.String" Category="Context" Description="Database that the documentation should be based on." %>
-<%@ Property Name="SourceDatabase" Type="SchemaExplorer.DatabaseSchema" Category="Context" Description="Database that the documentation should be based on." %>
-<%@ Property Name="CurrentTable" Type="SchemaExplorer.TableSchema" Category="Context" Description="Database that the documentation should be based on." %>
-<%@ Property Name="OutputDirectory" Type="System.String" Category="Output" Description="The name of the actual database server that is being documented." %>
 <%@ Assembly Name="SchemaExplorer" %>
 <%@ Assembly Name="System.Design" %>
 <%@ Assembly Name="System.Linq" %>
-
 <%@ Assembly Name="System.Data" %>
 <%@ Import Namespace="SchemaExplorer" %>
 <%@ Import NameSpace="System.IO" %>
 <%@ Import Namespace="System.Data" %>
-namespace <%= this.ProjectName %>.Engine.Data
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
 {
     using System;
     using System.Data;
     using PetaPoco;
-    using Vento.Engine.Models;
+    using <% = this.SolutionName %>.<% = this.ProjectAliases["Engine"] %>.Models;
 
     internal partial class <%= this.GetDataClassName(CurrentTable) %> : I<%= this.GetDataClassName(CurrentTable) %>
     {
