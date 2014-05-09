@@ -11,10 +11,17 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models
     using System;
     using PetaPoco;
 
+    <% if (this.RenderBody) 
+    { // START RENDERBODY
+    %>
     [PetaPoco.PrimaryKey("<%= GetPrimaryKeyName(CurrentTable) %>")]
     [PetaPoco.TableName("<%= CurrentTable.Name %>")]
+     <% } // END RENDERBODY %>
     internal partial class <%= this.GetModelClassName(CurrentTable) %>
     {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
         #region Public Properties
         <% if (CurrentTable.PrimaryKey != null)
         {    
@@ -28,6 +35,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models
 		<% if (i < CurrentTable.NonPrimaryKeyColumns.Count - 1) Response.Write("\r\n"); %>		
 		<% } %>
 		#endregion
+        <% } // END RENDERBODY %>
     }
 }
 <script runat="template">

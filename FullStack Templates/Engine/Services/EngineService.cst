@@ -15,6 +15,9 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Services
     
     internal partial class <%= this.GetManagerClassName(CurrentTable) %>
     {
+         <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
         public I<%= this.GetDataClassName(CurrentTable) %> DataService { get; set; }
         
         public <%= this.GetManagerClassName(CurrentTable) %>()
@@ -26,6 +29,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Services
         {
             this.DataService = dataService;
         }
+        <% } // END RENDERBODY %>
     }
 }
 <script runat="template">

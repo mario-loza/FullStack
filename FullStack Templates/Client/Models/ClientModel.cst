@@ -12,6 +12,9 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models
     
     internal partial class <%= this.GetModelClassName(CurrentTable) %>
     {
+         <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
         #region Public Properties
     
         public <%= GetPrimaryKeyType(CurrentTable) %> Id { get; set; }
@@ -21,6 +24,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models
 		<% } %>
         
 		#endregion
+        <% } // END RENDERBODY %>
     }
 }
 <script runat="template">

@@ -19,7 +19,8 @@ public override void Render(TextWriter writer)
 {
     
     this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias));
-   
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, "Controllers"));
+    
     string projectLocation = Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, this.CurrentProjectAlias + ".csproj");
    
     if (this.CreateProjectFiles)
@@ -54,18 +55,33 @@ public override void Render(TextWriter writer)
         {
             _currentStep = 1;
              
+            this.ExecuteTemplate(this.Create<ControllerTemplate>(), "Building UI",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Controllers","{0}Controller.cs")); 
+            this.AddFileToProject(projectLocation,"Controllers",string.Format("{0}Controller.cs", this.GetClassName(this.CurrentTable)), string.Empty);
+            
             this.ExecuteTemplate(this.Create<ControllerTemplate>(), "Building UI",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Controllers","{0}Controller.gen.cs")); 
-            this.AddFileToProject(projectLocation,"Controllers",string.Format("{0}Controller.gen.cs", this.GetClassName(this.CurrentTable)), string.Empty);
+            this.AddFileToProject(projectLocation,"Controllers",string.Format("{0}Controller.gen.cs", this.GetClassName(this.CurrentTable)), string.Format("{0}Controller.cs", this.GetClassName(this.CurrentTable)));
         }
     }
 }
 
 public void ExecuteTemplate(CodeTemplate template, string message, string formatPath)
 {
-            Trace.WriteLine("Building Models...");
+                     Trace.WriteLine(message);
             template.Progress.OnProgress += new ProgressEventHandler(this.OnProgress);
             this.CopyPropertiesTo(template);
-            template.RenderToFile(string.Format(formatPath, this.GetClassName(this.CurrentTable)), true);
+            FullStack.Common.MasterTemplate masterTemplate = template as FullStack.Common.MasterTemplate;
+            if (masterTemplate != null) 
+            {
+                masterTemplate.RenderBody = formatPath.Contains(".gen.");
+            }
+            
+            if (formatPath.Contains("{0}")){
+                template.RenderToFile(string.Format(formatPath, this.GetClassName(this.CurrentTable)), true);    
+            } else 
+            {
+                template.RenderToFile(formatPath, true);
+            }
+            
             this.Progress.Value = (_currentTableCount/_totalTableCount)*_currentStep;
             _currentStep++;
 }

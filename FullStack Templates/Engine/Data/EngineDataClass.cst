@@ -13,8 +13,12 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
     using PetaPoco;
     using <% = this.SolutionName %>.<% = this.ProjectAliases["Engine"] %>.Models;
 
-    internal partial class <%= this.GetDataClassName(CurrentTable) %> : I<%= this.GetDataClassName(CurrentTable) %>
+    <%-- ONLY RENDER THE INTERFACE IF WE ARE RENDERING THE BODY--%>
+    internal partial class <%= this.GetDataClassName(CurrentTable) %><% if (this.RenderBody) { %> : I<%= this.GetDataClassName(CurrentTable) %><% } %>
     {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
         public <%= this.GetModelClassName(CurrentTable) %> Create(<%= this.GetModelClassName(CurrentTable) %> model)
 		{
 		    using (Database db = DbFactory.GetDatabase())
@@ -60,7 +64,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
             
             return result;
 		}
-		
+		<% } // END RENDERBODY %>
     }
 }
 <script runat="template">
