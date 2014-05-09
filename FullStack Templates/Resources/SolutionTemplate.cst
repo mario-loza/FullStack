@@ -1,0 +1,43 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<%@ Property Name="ProjectName" Type="System.String" Category="Context" Description="Database that the documentation should be based on." %>
+<%@ Property Name="SourceDatabase" Type="SchemaExplorer.DatabaseSchema" Category="Context" Description="Database that the documentation should be based on." %>
+<%@ Property Name="OutputDirectory" Type="System.String" Category="Output" Description="The name of the actual database server that is being documented." %>
+<%@ Property Name="ProjectGuids" Type="System.Collections.Generic.Dictionary<System.String, System.Guid>" Category="Output" Description="The name of the actual database server that is being documented." %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Linq" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Assembly Name="System.Collections" %>
+<%@ Import NameSpace="System.IO" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Collections.Generic" %>
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
+<% 
+    foreach (var name in ProjectGuids.Keys)
+	{      
+        %>        
+Project("<%= this.GetProjectTypeGuid(FullStack.Common.ProjectType.WindowsCSharp ) %>") = "<%= name %>", "<%= name %>\<%= name %>.csproj", "<% = ProjectGuids[name].ToString("B").ToUpper() %>"
+EndProject 
+<%	} %>
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+    <% foreach (var name in ProjectGuids.Keys)
+	{      
+        %>        
+		<% = ProjectGuids[name].ToString("B").ToUpper() %>.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		<% = ProjectGuids[name].ToString("B").ToUpper() %>.Debug|Any CPU.Build.0 = Debug|Any CPU
+		<% = ProjectGuids[name].ToString("B").ToUpper() %>.Release|Any CPU.ActiveCfg = Release|Any CPU
+		<% = ProjectGuids[name].ToString("B").ToUpper() %>.Release|Any CPU.Build.0 = Release|Any CPU
+<%	} %>		
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

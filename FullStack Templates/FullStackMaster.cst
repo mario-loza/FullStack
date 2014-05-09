@@ -1,0 +1,65 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" CompilerVersion="v4.0" OutputType="None" %>
+<%@ Property Name="ProjectName" Type="System.String" Category="Context" Default="ElementPs"  %>
+<%@ Property Name="CompanyName" Type="System.String" Category="Context" Default="Element PS"  %>
+<%@ Property Name="SourceDatabase" Type="SchemaExplorer.DatabaseSchema" Category="Context" Default="PetShop"  %>
+<%@ Property Name="CurrentTable" Type="SchemaExplorer.TableSchema" Category="Context" Optional="True" %>
+<%@ Property Name="OutputDirectory" Type="System.String" Category="Output" Description="The name of the actual database server that is being documented." Default="D:\VentoGenOut" %>
+<%@ Property Name="ProjectGuids" Type="System.Collections.Generic.Dictionary<System.String, System.Guid>" Category="Output" Optional="True" %>
+<%@ Register Name="EngineMasterTemplate" Template="Engine\EngineMaster.cst" %>
+<%@ Register Name="WebApiMasterTemplate" Template="WebApi\WebApiMaster.cst" %>
+<%@ Register Name="ClientMasterTemplate" Template="Client\ClientMaster.cst" %>
+<%@ Register Name="SolutionTemplate" Template="Resources\SolutionTemplate.cst" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Linq" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Assembly Name="System.Xml.Linq" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import NameSpace="System.IO" %>
+<%@ Import Namespace="System.Data" %>
+
+<script runat="template">
+private int _currentStep = 0;
+private int _currentTableCount = 0;
+private int _totalTableCount = 0;
+
+public override void Render(TextWriter writer)
+{
+    this.ClearDirectory(this.OutputDirectory);
+    
+    List<string> projects = new List<string>() { "Client", "WebApi", "Engine" };
+  
+    this.ProjectGuids = new System.Collections.Generic.Dictionary<System.String, System.Guid>();
+    foreach (var name in projects)
+	{
+		  ProjectGuids.Add(name, Guid.NewGuid());       
+	}
+    
+    var solutionTemplate = this.Create<SolutionTemplate>();
+    this.CopyPropertiesTo(solutionTemplate);
+    solutionTemplate.RenderToFile(string.Format(Path.Combine(this.OutputDirectory,this.ProjectName,"{0}.sln"), this.ProjectName), true);
+    
+    var engineMaster = this.Create<EngineMasterTemplate>();
+    this.CopyPropertiesTo(engineMaster);   
+    engineMaster.RenderToString();
+    
+    var webApiMaster = this.Create<WebApiMasterTemplate>();
+    this.CopyPropertiesTo(webApiMaster);
+    webApiMaster.RenderToString();
+    
+    var clientMaster = this.Create<ClientMasterTemplate>();
+    this.CopyPropertiesTo(clientMaster);
+    clientMaster.RenderToString();
+    
+
+         
+}
+
+public void OnProgress(object sender, ProgressEventArgs e)
+{
+    if (e.Value > 0)
+    {
+        this.Progress.Value = 75 + (_currentStep * 100) + (int)(((Double)e.Value / (Double)e.MaximumValue) * 100);
+    }
+}
+</script>

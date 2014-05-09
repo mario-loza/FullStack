@@ -1,0 +1,73 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<%@ Property Name="ProjectName" Type="System.String" Category="Context" Description="Database that the documentation should be based on." %>
+<%@ Property Name="SourceDatabase" Type="SchemaExplorer.DatabaseSchema" Category="Context" Description="Database that the documentation should be based on." %>
+<%@ Property Name="CurrentTable" Type="SchemaExplorer.TableSchema" Category="Context" Description="Database that the documentation should be based on." %>
+<%@ Property Name="OutputDirectory" Type="System.String" Category="Output" Description="The name of the actual database server that is being documented." %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Linq" %>
+
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import NameSpace="System.IO" %>
+<%@ Import Namespace="System.Data" %>
+namespace <%= this.ProjectName %>.Engine.Data
+{
+    using System;
+    using System.Data;
+    using PetaPoco;
+    using Vento.Engine.Models;
+
+    internal partial class <%= this.GetDataClassName(CurrentTable) %> : I<%= this.GetDataClassName(CurrentTable) %>
+    {
+        public <%= this.GetModelClassName(CurrentTable) %> Create(<%= this.GetModelClassName(CurrentTable) %> model)
+		{
+		    using (Database db = DbFactory.GetDatabase())
+            {
+               object output = db.Insert(model);
+               if (output != null)
+               {
+                    model = Read((<%= this.GetPrimaryKeyType(CurrentTable) %>)output);
+               }
+            }
+            
+            return model;
+		}
+        
+         public <%= this.GetModelClassName(CurrentTable) %> Read(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+		{
+		    <%= this.GetModelClassName(CurrentTable) %> model = null;
+            using (Database db = DbFactory.GetDatabase())
+            {
+                total = db.SingleOrDefault<RunningTotal>("WHERE <%= this.GetPrimaryKeyName(CurrentTable) %>=@0", id);
+            }
+
+            return model;
+		}
+        
+        public <%= this.GetModelClassName(CurrentTable) %> Update(<%= this.GetModelClassName(CurrentTable) %> model)
+		{
+			using (Database db = DbFactory.GetDatabase())
+            {
+                bool result = db.Update(model) > 0;                
+            }
+            
+            return model;
+		}
+        
+        public bool Delete(<%= GetPrimaryKeyType(CurrentTable) %> id)
+		{
+            bool result = false;
+            using (Database db = DbFactory.GetDatabase())
+            {
+                result = db.Delete(id) > 0;                
+            }
+            
+            return result;
+		}
+		
+    }
+}
+<script runat="template">
+
+</script>

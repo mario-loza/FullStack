@@ -1,0 +1,79 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
+<%@ Property Name="ProjectName" Type="System.String" Category="Context" %>
+<%@ Property Name="CompanyName" Type="System.String" Category="Context" Default="Element PS"  %>
+<%@ Property Name="SourceDatabase" Type="SchemaExplorer.DatabaseSchema" Category="Context" %>
+<%@ Property Name="CurrentTable" Type="SchemaExplorer.TableSchema" Category="Context" %>
+<%@ Property Name="OutputDirectory" Type="System.String" Category="Output" %>
+<%@ Property Name="ProjectGuids" Type="System.Collections.Generic.Dictionary<System.String, System.Guid>" Optional="True" %>
+<%@ Register Name="ClientModelTemplate" Template="Models\ClientModel.cst" %>
+<%@ Register Name="ProjectTemplate" Template="../Resources/EmptyProject.cst" %>
+<%@ Register Name="AssemblyInfoTemplate" Template="../Resources/AssemblyInfoTemplate.cst" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Linq" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Assembly Name="System.Xml.Linq" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import NameSpace="System.IO" %>
+<%@ Import Namespace="System.Data" %>
+
+
+<script runat="template">
+private int _currentStep = 0;
+private int _currentTableCount = 0;
+private int _totalTableCount = 0;
+
+public override void Render(TextWriter writer)
+{
+    
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.ProjectName,"Client"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.ProjectName,"Client","Models"));
+       
+    ProjectTemplate projectTemplate = this.Create<ProjectTemplate>();
+    string projectLocation = Path.Combine(this.OutputDirectory,this.ProjectName,"Client","Client.csproj");
+    projectTemplate.RenderToFile(projectLocation, true);
+    
+    this.CleanupProjectFile(projectLocation);
+    
+    AssemblyInfoTemplate assemblyTemplate = this.Create<AssemblyInfoTemplate>();
+    this.CopyPropertiesTo(assemblyTemplate);
+    assemblyTemplate.SubProjectName = "Client";
+    string assemblyTemplateLocation = Path.Combine(this.OutputDirectory,this.ProjectName,"Client","Properties","AssemblyInfo.cs");
+    assemblyTemplate.RenderToFile(assemblyTemplateLocation, true);
+    
+    _totalTableCount = this.SourceDatabase.Tables.Count;
+    _currentTableCount = 0;
+    
+    foreach(TableSchema table in this.SourceDatabase.Tables)
+    {
+        this.CurrentTable = table;
+        _currentTableCount++;
+     
+        if (this.HasValidPrimaryKey(this.CurrentTable))
+        {
+            _currentStep = 1;
+             
+            this.ExecuteTemplate(this.Create<ClientModelTemplate>(), "Building Models",Path.Combine(this.OutputDirectory,this.ProjectName,"Client","Models","{0}Model.gen.cs"));
+            this.AddFileToProject(projectLocation,"Models",string.Format("{0}Model.gen.cs", this.GetClassName(this.CurrentTable)), string.Empty);;            
+        }
+    }
+}
+
+public void ExecuteTemplate(CodeTemplate template, string message, string formatPath)
+{
+            Trace.WriteLine("Building Models...");
+            template.Progress.OnProgress += new ProgressEventHandler(this.OnProgress);
+            this.CopyPropertiesTo(template);
+            template.RenderToFile(string.Format(formatPath, this.GetClassName(this.CurrentTable)), true);
+            this.Progress.Value = (_currentTableCount/_totalTableCount)*_currentStep;
+            _currentStep++;
+}
+
+public void OnProgress(object sender, ProgressEventArgs e)
+{
+    if (e.Value > 0)
+    {
+        this.Progress.Value = 75 + (_currentStep * 100) + (int)(((Double)e.Value / (Double)e.MaximumValue) * 100);
+    }
+}
+</script>
