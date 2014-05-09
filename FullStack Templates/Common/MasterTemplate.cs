@@ -646,6 +646,51 @@
             template.Render(this.Response);
         }
 
+                
+        public void BuildCurrentTableTemplate(CodeTemplate template, string projectLocation, string subFolderPath, string generatedFileNameFormat, string parentFileNameFormat)
+        {
+                    if (!string.IsNullOrEmpty(parentFileNameFormat))
+                    {
+                        this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,subFolderPath, parentFileNameFormat)); 
+                        this.AddFileToProject(projectLocation,subFolderPath,string.Format(parentFileNameFormat, this.GetClassName(this.CurrentTable)), string.Empty);
+                    
+                        this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,subFolderPath, generatedFileNameFormat)); 
+                        this.AddFileToProject(projectLocation,subFolderPath,string.Format(generatedFileNameFormat, this.GetClassName(this.CurrentTable)), string.Format(parentFileNameFormat,this.GetClassName(this.CurrentTable)));
+
+                    }
+                    else 
+                    {
+                        this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,subFolderPath, generatedFileNameFormat)); 
+                        this.AddFileToProject(projectLocation,subFolderPath,string.Format(generatedFileNameFormat, this.GetClassName(this.CurrentTable)), string.Empty);
+                    }
+                      
+        }
+
+        public void ExecuteTemplate(CodeTemplate template,  string formatPath)
+        {
+                    this.CopyPropertiesTo(template);
+                    FullStack.Common.MasterTemplate masterTemplate = template as FullStack.Common.MasterTemplate;
+                    if (masterTemplate != null) 
+                    {
+                        masterTemplate.RenderBody = formatPath.Contains(".gen.");
+                    }
+                    
+                    if (formatPath.Contains("{0}")){
+                        template.RenderToFile(string.Format(formatPath, this.GetClassName(this.CurrentTable)), true);    
+                    } else 
+                    {
+                        template.RenderToFile(formatPath, true);
+                    }
+        }
+        
+        
+        public void OnProgress(object sender, ProgressEventArgs e)
+        {
+            //if (e.Value > 0)
+            //{
+            //    this.Progress.Value = 75 + (_currentStep * 100) + (int)(((Double)e.Value / (Double)e.MaximumValue) * 100);
+            //}
+        }
         #endregion
     }
 

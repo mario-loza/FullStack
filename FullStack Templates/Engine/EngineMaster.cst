@@ -52,14 +52,11 @@ public override void Render(TextWriter writer)
     // ADD STATIC FILES
     
     #region STATIC DATA FILES
-    File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Models","PetaPoco.txt"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models","PetaPoco.cs"));
-    this.AddFileToProject(projectLocation,"Models",string.Format("PetaPoco.cs", this.GetClassName(this.CurrentTable)), string.Empty);
+     File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Models","PetaPoco.txt"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models","PetaPoco.cs"));
+     this.AddFileToProject(projectLocation,"Models",string.Format("PetaPoco.cs", this.GetClassName(this.CurrentTable)), string.Empty);
     
-     this.ExecuteTemplate(this.Create<DbFactory>(), "Creating Static Data File",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Data","DbFactory.cs"));
-     this.AddFileToProject(projectLocation,"Data","DbFactory.cs", string.Empty);
-     
-     this.ExecuteTemplate(this.Create<DbProviderTypes>(), "Creating Static Data File",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Data","DbProviderTypes.cs"));
-     this.AddFileToProject(projectLocation,"Data","DbProviderTypes.cs", string.Empty);
+     this.BuildCurrentTableTemplate(this.Create<DbFactory>(),projectLocation,"Data","DbFactory.cs", string.Empty);
+     this.BuildCurrentTableTemplate(this.Create<DbProviderTypes>(),projectLocation,"Data","DbProviderTypes.cs", string.Empty);
     
     #endregion
     
@@ -72,60 +69,11 @@ public override void Render(TextWriter writer)
         {
             _currentStep = 1;
              
-            this.ExecuteTemplate(this.Create<EngineModelsTemplate>(), "Building Models",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models","{0}Model.cs"));
-            this.AddFileToProject(projectLocation,"Models",string.Format("{0}Model.cs", this.GetClassName(this.CurrentTable)), string.Empty);
-            
-             this.ExecuteTemplate(this.Create<EngineModelsTemplate>(), "Building Models",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models","{0}Model.gen.cs"));
-            this.AddFileToProject(projectLocation,"Models",string.Format("{0}Model.gen.cs", this.GetClassName(this.CurrentTable)), string.Format("{0}Model.cs", this.GetClassName(this.CurrentTable)));
-            
-            this.ExecuteTemplate(this.Create<EngineDataClassTemplate>(), "Building Data Access",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Data","{0}Data.cs"));
-            this.AddFileToProject(projectLocation,"Data",string.Format("{0}Data.cs", this.GetClassName(this.CurrentTable)), string.Empty);
-            
-            this.ExecuteTemplate(this.Create<EngineDataClassTemplate>(), "Building Data Access",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Data","{0}Data.gen.cs"));
-            this.AddFileToProject(projectLocation,"Data",string.Format("{0}Data.gen.cs", this.GetClassName(this.CurrentTable)), string.Format("{0}Data.cs", this.GetClassName(this.CurrentTable)));
-            
-            this.ExecuteTemplate(this.Create<EngineDataInterfaceTemplate>(), "Building Data Interface",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Data","I{0}Data.cs"));
-            this.AddFileToProject(projectLocation,"Data",string.Format("I{0}Data.cs", this.GetClassName(this.CurrentTable)), string.Empty);
-            
-            this.ExecuteTemplate(this.Create<EngineDataInterfaceTemplate>(), "Building Data Interface",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Data","I{0}Data.gen.cs"));
-            this.AddFileToProject(projectLocation,"Data",string.Format("I{0}Data.gen.cs", this.GetClassName(this.CurrentTable)), string.Format("I{0}Data.cs", this.GetClassName(this.CurrentTable)));
-            
-            this.ExecuteTemplate(this.Create<EngineServicesTemplate>(), "Building Services",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Services","{0}Manager.cs"));
-            this.AddFileToProject(projectLocation,"Services",string.Format("{0}Manager.cs", this.GetClassName(this.CurrentTable)), string.Empty);
-            
-            this.ExecuteTemplate(this.Create<EngineServicesTemplate>(), "Building Services",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Services","{0}Manager.gen.cs"));
-            this.AddFileToProject(projectLocation,"Services",string.Format("{0}Manager.gen.cs", this.GetClassName(this.CurrentTable)), string.Format("{0}Manager.cs", this.GetClassName(this.CurrentTable)));
-        }
-    }
-}
-
-public void ExecuteTemplate(CodeTemplate template, string message, string formatPath)
-{
-            Trace.WriteLine(message);
-            template.Progress.OnProgress += new ProgressEventHandler(this.OnProgress);
-            this.CopyPropertiesTo(template);
-            FullStack.Common.MasterTemplate masterTemplate = template as FullStack.Common.MasterTemplate;
-            if (masterTemplate != null) 
-            {
-                masterTemplate.RenderBody = formatPath.Contains(".gen.");
-            }
-            
-            if (formatPath.Contains("{0}")){
-                template.RenderToFile(string.Format(formatPath, this.GetClassName(this.CurrentTable)), true);    
-            } else 
-            {
-                template.RenderToFile(formatPath, true);
-            }
-            
-            this.Progress.Value = (_currentTableCount/_totalTableCount)*_currentStep;
-            _currentStep++;
-}
-
-public void OnProgress(object sender, ProgressEventArgs e)
-{
-    if (e.Value > 0)
-    {
-        this.Progress.Value = 75 + (_currentStep * 100) + (int)(((Double)e.Value / (Double)e.MaximumValue) * 100);
+            this.BuildCurrentTableTemplate(this.Create<EngineModelsTemplate>(),projectLocation,"Models","{0}Model.gen.cs","{0}Model.cs");
+            this.BuildCurrentTableTemplate(this.Create<EngineDataClassTemplate>(),projectLocation,"Data","{0}Data.gen.cs","{0}Data.cs");
+            this.BuildCurrentTableTemplate(this.Create<EngineDataInterfaceTemplate>(),projectLocation,"Data","I{0}Data.gen.cs","I{0}Data.cs");
+            this.BuildCurrentTableTemplate(this.Create<EngineServicesTemplate>(),projectLocation,"Services","{0}Manager.gen.cs","{0}Manager.cs");
+         }
     }
 }
 </script>

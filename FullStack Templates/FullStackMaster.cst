@@ -14,25 +14,28 @@
 <%@ Import Namespace="System.Data" %>
 
 <script runat="template">
-private int _currentStep = 0;
-private int _currentTableCount = 0;
-private int _totalTableCount = 0;
-
 public override void Render(TextWriter writer)
-{
-    if (!File.Exists(Path.Combine(string.Format(Path.Combine(this.OutputDirectory, this.SolutionName, "{0}.sln"), this.SolutionName))))
-    {        
-        this.CreateProjectFiles = true;
-    }
-    
-    this.ClearDirectory(this.OutputDirectory);
-    
+{       
     this.ProjectAliases  = new System.Collections.Generic.Dictionary<string,string>(){
              {"Engine","Engine"},
              {"Client","Client"},
              {"WebApi","WebApi"},
            };
     
+    if (Directory.Exists(Path.Combine(this.OutputDirectory, this.SolutionName)))
+    {
+        // UNCOMMENT TO ALWAYS WIPE
+        //Directory.Delete(Path.Combine(this.OutputDirectory, this.SolutionName), true);
+        //Directory.CreateDirectory(Path.Combine(this.OutputDirectory, this.SolutionName));    
+    }    
+    
+    if (!File.Exists(Path.Combine(string.Format(Path.Combine(this.OutputDirectory, this.SolutionName, "{0}.sln"), this.SolutionName))))
+    {        
+        this.CreateProjectFiles = true;
+    }
+    
+    this.ClearDirectory(this.OutputDirectory);
+ 
     this.ProjectGuids = new System.Collections.Generic.Dictionary<System.String, System.Guid>();
     
     foreach (var key in this.ProjectAliases.Keys)
@@ -80,15 +83,5 @@ public override void Render(TextWriter writer)
     this.CopyPropertiesTo(clientMaster);
     clientMaster.ProjectName = "Client";
     clientMaster.RenderToString();
-    
- 
-}
-
-public void OnProgress(object sender, ProgressEventArgs e)
-{
-    if (e.Value > 0)
-    {
-        this.Progress.Value = 75 + (_currentStep * 100) + (int)(((Double)e.Value / (Double)e.MaximumValue) * 100);
-    }
 }
 </script>
