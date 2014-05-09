@@ -3,6 +3,7 @@
 <%@ Register Name="WebApiMasterTemplate" Template="WebApi\WebApiMaster.cst" %>
 <%@ Register Name="ClientMasterTemplate" Template="Client\ClientMaster.cst" %>
 <%@ Register Name="SolutionTemplate" Template="Resources\SolutionTemplate.cst" %>
+<%@ Register Name="RepositoryTemplate" Template="Resources\RepositoriesTemplate.cst" %>
 <%@ Assembly Name="SchemaExplorer" %>
 <%@ Assembly Name="System.Design" %>
 <%@ Assembly Name="System.Linq" %>
@@ -44,6 +45,25 @@ public override void Render(TextWriter writer)
         var solutionTemplate = this.Create<SolutionTemplate>();
         this.CopyPropertiesTo(solutionTemplate);
         solutionTemplate.RenderToFile(string.Format(Path.Combine(this.OutputDirectory, this.SolutionName, "{0}.sln"), this.SolutionName), true);    
+        
+        var repositoryTemplate = this.Create<RepositoryTemplate>();
+        this.CopyPropertiesTo(repositoryTemplate);
+        repositoryTemplate.RenderToFile(Path.Combine(this.OutputDirectory, this.SolutionName, "repositories.config"), true);    
+        
+        // Copy Packages
+        string nugetPath = Path.Combine(this.OutputDirectory,this.SolutionName,".nuget");
+        if (!System.IO.Directory.Exists(nugetPath)){
+            System.IO.Directory.CreateDirectory(nugetPath);    
+            
+            var nugetFiles = System.IO.Directory.EnumerateFiles(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Resources","nuget"));
+            foreach (var filePath in nugetFiles)
+        	{
+        	    FileInfo fi = new FileInfo(filePath);
+                fi.CopyTo(Path.Combine(nugetPath,fi.Name));
+        	}
+        }
+        
+        
     }
         
     var engineMaster = this.Create<EngineMasterTemplate>();
@@ -60,6 +80,8 @@ public override void Render(TextWriter writer)
     this.CopyPropertiesTo(clientMaster);
     clientMaster.ProjectName = "Client";
     clientMaster.RenderToString();
+    
+ 
 }
 
 public void OnProgress(object sender, ProgressEventArgs e)

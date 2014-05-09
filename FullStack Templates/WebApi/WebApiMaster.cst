@@ -31,6 +31,9 @@ public override void Render(TextWriter writer)
         string engineAlias = this.ProjectAliases["Engine"];
         this.AddProjectReferenceToProject(projectLocation, string.Format("../{0}/{0}.csproj",engineAlias), ProjectGuids["Engine"], engineAlias);
         this.CleanupProjectFile(projectLocation);
+  
+        // Copy Packages
+        File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"packages.config"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"packages.config"));
     }
 
     

@@ -34,7 +34,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
 		    <%= this.GetModelClassName(CurrentTable) %> model = null;
             using (Database db = DbFactory.GetDatabase())
             {
-                total = db.SingleOrDefault<RunningTotal>("WHERE <%= this.GetPrimaryKeyName(CurrentTable) %>=@0", id);
+                model = db.SingleOrDefault<<%= this.GetModelClassName(CurrentTable) %>>("WHERE <%= this.GetPrimaryKeyName(CurrentTable) %>=@0", id);
             }
 
             return model;
@@ -55,7 +55,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
             bool result = false;
             using (Database db = DbFactory.GetDatabase())
             {
-                result = db.Delete(id) > 0;                
+                result = db.Delete<<%= this.GetModelClassName(CurrentTable) %>>(id) > 0;                
             }
             
             return result;

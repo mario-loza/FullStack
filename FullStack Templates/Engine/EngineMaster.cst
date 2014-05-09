@@ -1,4 +1,6 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
+<%@ Register Name="DbFactory" Template="Data\DbFactory_Static.cst" %>
+<%@ Register Name="DbProviderTypes" Template="Data\DbProviderTypes_Static.cst" %>
 <%@ Register Name="EngineDataClassTemplate" Template="Data\EngineDataClass.cst" %>
 <%@ Register Name="EngineDataInterfaceTemplate" Template="Data\EngineDataInterface.cst" %>
 <%@ Register Name="EngineModelsTemplate" Template="Models\EngineModel.cst" %>
@@ -33,6 +35,9 @@ public override void Render(TextWriter writer)
         this.CopyPropertiesTo(projectTemplate);
         projectTemplate.RenderToFile(projectLocation, true);
         this.CleanupProjectFile(projectLocation);
+        
+        // Copy Packages
+        File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"packages.config"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"packages.config"));
     }
     
     AssemblyInfoTemplate assemblyTemplate = this.Create<AssemblyInfoTemplate>();
@@ -42,6 +47,20 @@ public override void Render(TextWriter writer)
     
     _totalTableCount = this.SourceDatabase.Tables.Count;
     _currentTableCount = 0;
+    
+    // ADD STATIC FILES
+    
+    #region STATIC DATA FILES
+    File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Models","PetaPoco.txt"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models","PetaPoco.cs"));
+    this.AddFileToProject(projectLocation,"Models",string.Format("PetaPoco.cs", this.GetClassName(this.CurrentTable)), string.Empty);
+    
+     this.ExecuteTemplate(this.Create<DbFactory>(), "Creating Static Data File",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Data","DbFactory.cs"));
+     this.AddFileToProject(projectLocation,"Data","DbFactory.cs", string.Empty);
+     
+     this.ExecuteTemplate(this.Create<DbProviderTypes>(), "Creating Static Data File",Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Data","DbProviderTypes.cs"));
+     this.AddFileToProject(projectLocation,"Data","DbProviderTypes.cs", string.Empty);
+    
+    #endregion
     
     foreach(TableSchema table in this.SourceDatabase.Tables)
     {
@@ -72,7 +91,13 @@ public void ExecuteTemplate(CodeTemplate template, string message, string format
             Trace.WriteLine("Building Models...");
             template.Progress.OnProgress += new ProgressEventHandler(this.OnProgress);
             this.CopyPropertiesTo(template);
-            template.RenderToFile(string.Format(formatPath, this.GetClassName(this.CurrentTable)), true);
+            if (formatPath.Contains("{0}")){
+                template.RenderToFile(string.Format(formatPath, this.GetClassName(this.CurrentTable)), true);    
+            } else 
+            {
+                template.RenderToFile(formatPath, true);
+            }
+            
             this.Progress.Value = (_currentTableCount/_totalTableCount)*_currentStep;
             _currentStep++;
 }

@@ -29,6 +29,9 @@ public override void Render(TextWriter writer)
         projectTemplate.RenderToFile(projectLocation, true);
         
         this.CleanupProjectFile(projectLocation);
+        
+        // Copy Packages
+        File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"packages.config"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"packages.config"));
     }
     
     AssemblyInfoTemplate assemblyTemplate = this.Create<AssemblyInfoTemplate>();

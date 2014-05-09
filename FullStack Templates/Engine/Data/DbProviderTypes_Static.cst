@@ -1,0 +1,10 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
+{
+    public enum DbProviderTypes
+    {
+        None = 0,
+        Unknown = 1,
+        SqlServer = 2,
+    }
+}

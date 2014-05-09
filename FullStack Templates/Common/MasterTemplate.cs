@@ -110,6 +110,7 @@ namespace FullStack.Common
                 {
                     this.DeleteFiles(path, "*.sln");
                     this.DeleteFiles(path, "*.csproj");
+                    this.DeleteFiles(path, "*.config");
                 }
                 // Clean up the existing output directory.
                 this.DeleteFiles(path, "*.cs");

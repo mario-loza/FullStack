@@ -1,0 +1,187 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
+{
+    using System;
+    using System.Configuration;
+    using System.Data;
+    using System.Data.SqlClient;
+
+    using PetaPoco;
+
+    /// <summary>
+    ///     Abstract the creation of SQL connections in case we want to implement different databases
+    /// </summary>
+    public static class DbFactory
+    {
+        #region Static Fields
+
+        /// <summary>
+        ///     A locally set version of the current provider so we don't check every time a request is made.
+        /// </summary>
+        private static DbProviderTypes currentProvider = DbProviderTypes.None;
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// Returns a PetaPoco database instance of the Default connection
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Database"/>.
+        /// </returns>
+        public static Database GetDatabase()
+        {
+            return new Database("Default");
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Data.SqlClient.SqlCommand"/> class with the text of the
+        ///     query and a <see cref="T:System.Data.SqlClient.SqlConnection"/>.
+        /// </summary>
+        /// <param name="cmdText">
+        /// The text of the query. 
+        /// </param>
+        /// <param name="conn">
+        /// A <see cref="T:System.Data.SqlClient.SqlConnection"/> that represents the connection to an
+        ///     instance of SQL Server.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IDbCommand"/>.
+        /// </returns>
+        public static IDbCommand GetDbCommand(string cmdText, IDbConnection conn)
+        {
+            var sqlConnection = conn as SqlConnection;
+            if (sqlConnection != null)
+            {
+                var cmd = new SqlCommand(cmdText, sqlConnection);
+                cmd.CommandType = CommandType.Text;
+                return cmd;
+            }
+
+            throw new ArgumentOutOfRangeException("conn", conn, "Connection could not be cast to SqlConnection. For now, Vento only supports MS SQL");
+        }
+
+        /// <summary>
+        /// Returns a DB Command based on the passed in connection
+        /// </summary>
+        /// <param name="conn">The connection for the command
+        /// </param>
+        /// <returns>
+        /// The <see cref="IDbCommand"/>.
+        /// </returns>
+        public static IDbCommand GetDbCommand(IDbConnection conn)
+        {
+            return GetDbCommand(string.Empty, conn);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Data.SqlClient.SqlConnection"/> class when given a string
+        ///     that contains the connection string.
+        /// </summary>
+        /// <param name="connectionString">
+        /// The connection used to open the SQL Server database.
+        /// </param>
+        /// <param name="openConnection">
+        /// If set to true, the connection will be opened, otherwise it will remain closed.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IDbConnection"/>.
+        /// </returns>
+        public static IDbConnection GetDbConnection(string connectionString, bool openConnection = true)
+        {
+            var conn = new SqlConnection(connectionString);
+            if (conn.State != ConnectionState.Open)
+            {
+                conn.Open();
+            }
+
+            return conn;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Data.SqlClient.SqlConnection"/> class when given a string
+        ///     that contains the connection string.
+        /// </summary>
+        /// <param name="openConnection">
+        /// If set to true, the connection will be opened, otherwise it will remain closed.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IDbConnection"/>.
+        /// </returns>
+        public static IDbConnection GetDbConnection(bool openConnection = true)
+        {
+            string connectionString = GetDefaultConnectionStringSetting().ConnectionString;
+            return GetDbConnection(connectionString);
+        }
+
+        /// <summary>
+        /// Gets the name of the Default initial catalog
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        public static string GetDbName()
+        {
+            return new SqlConnectionStringBuilder(GetDefaultConnectionStringSetting().ConnectionString).InitialCatalog;
+        }
+
+        /// <summary>
+        /// Gets the default connection string from the config file
+        /// </summary>
+        /// <returns>
+        /// The <see cref="ConnectionStringSettings"/>.
+        /// </returns>
+        public static ConnectionStringSettings GetDefaultConnectionStringSetting()
+        {
+            return ConfigurationManager.ConnectionStrings["Default"];
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Data.SqlClient.SqlConnection"/> class when given a string
+        ///     that contains the connection string.
+        /// </summary>
+        /// <param name="openConnection">
+        /// If set to true, the connection will be opened, otherwise it will remain closed.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IDbConnection"/>.
+        /// </returns>
+        public static IDbConnection GetMasterDbConnection(bool openConnection = true)
+        {
+            string connectionString = GetDefaultConnectionStringSetting().ConnectionString;
+            var builder = new SqlConnectionStringBuilder(connectionString);
+            builder.InitialCatalog = "master";
+            return GetDbConnection(builder.ToString());
+        }
+
+        /// <summary>
+        /// Returns the default provider type from the connection string
+        /// </summary>
+        /// <returns>
+        /// The <see cref="DbProviderTypes"/>.
+        /// </returns>
+        public static DbProviderTypes GetProviderType()
+        {
+            if (currentProvider == DbProviderTypes.None)
+            {
+                string providerName = GetDefaultConnectionStringSetting().ProviderName;
+
+                // SQL 
+                if (providerName.Equals("System.Data.SqlClient", StringComparison.OrdinalIgnoreCase))
+                {
+                    currentProvider = DbProviderTypes.SqlServer;
+                }
+                else
+                {
+                    currentProvider = DbProviderTypes.Unknown;
+                    throw new ConfigurationErrorsException(string.Format("Unknown connection string provider name: [{0}]", providerName));
+                }
+            }
+
+            return currentProvider;
+        }
+
+        #endregion
+    }
+}

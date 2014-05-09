@@ -1,0 +1,5 @@
+﻿<%@ Template Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" %>
+<?xml version="1.0" encoding="utf-8"?>
+<repositories>
+  <repository path="..\<%=this.ProjectAliases["Engine"] %>\packages.config" />
+</repositories>
