@@ -1,5 +1,7 @@
 ﻿<%@ Template Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" %>
 <?xml version="1.0" encoding="utf-8"?>
 <repositories>
-  <repository path="..\<%=this.ProjectAliases["Engine"] %>\packages.config" />
+  <repository path="..\<%=this.StackProjects["Engine"].Alias %>\packages.config" /> 
+  <repository path="..\<%=this.StackProjects["Client"].Alias %>\packages.config" /> 
+  <repository path="..\<%=this.StackProjects["WebApi"].Alias %>\packages.config" /> 
 </repositories>

@@ -15,40 +15,39 @@
 
 <script runat="template">
 public override void Render(TextWriter writer)
-{       
-    this.ProjectAliases  = new System.Collections.Generic.Dictionary<string,string>(){
-             {"Engine","Engine"},
-             {"Client","Client"},
-             {"WebApi","WebApi"},
+{   
+    // Project aliases allow you to rename what each area is called. Keep the key the same value since we lookup from this table.
+    this.StackProjects  = new System.Collections.Generic.Dictionary<string,FullStack.Common.ProjectInfo>(){
+             {"Engine", new FullStack.Common.ProjectInfo("Engine", System.Guid.NewGuid(), FullStack.Common.ProjectType.WindowsCSharp)},
+             {"Client", new FullStack.Common.ProjectInfo("Client", System.Guid.NewGuid(), FullStack.Common.ProjectType.WindowsCSharp)},
+             {"WebApi", new FullStack.Common.ProjectInfo("WebApi", System.Guid.NewGuid(), FullStack.Common.ProjectType.ASPNET_ONE)},
            };
     
+    // Uncomment this code to always wipe the entire directory structure
     if (Directory.Exists(Path.Combine(this.OutputDirectory, this.SolutionName)))
     {
-        // UNCOMMENT TO ALWAYS WIPE
         //Directory.Delete(Path.Combine(this.OutputDirectory, this.SolutionName), true);
         //Directory.CreateDirectory(Path.Combine(this.OutputDirectory, this.SolutionName));    
     }    
     
+    // If there is no solution file then we must run all code associated with creating project files
     if (!File.Exists(Path.Combine(string.Format(Path.Combine(this.OutputDirectory, this.SolutionName, "{0}.sln"), this.SolutionName))))
     {        
         this.CreateProjectFiles = true;
     }
     
+    // Clear out the base directory and create it if it doesn't exist
     this.ClearDirectory(this.OutputDirectory);
  
-    this.ProjectGuids = new System.Collections.Generic.Dictionary<System.String, System.Guid>();
-    
-    foreach (var key in this.ProjectAliases.Keys)
-	{
-		   ProjectGuids.Add(key, Guid.NewGuid());    
-	}
-    
+   
     if (this.CreateProjectFiles) 
     {
+        // Create the Solution (SLN) file
         var solutionTemplate = this.Create<SolutionTemplate>();
         this.CopyPropertiesTo(solutionTemplate);
         solutionTemplate.RenderToFile(string.Format(Path.Combine(this.OutputDirectory, this.SolutionName, "{0}.sln"), this.SolutionName), true);    
         
+        // Create the NuGet repositoy
         var repositoryTemplate = this.Create<RepositoryTemplate>();
         this.CopyPropertiesTo(repositoryTemplate);
         repositoryTemplate.RenderToFile(Path.Combine(this.OutputDirectory, this.SolutionName, "repositories.config"), true);    

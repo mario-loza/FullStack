@@ -1,20 +1,20 @@
-﻿namespace FullStack.Common
-{
-    ﻿using System;
-    using System.IO;
-    using System.Data;
-    using System.Data.SqlClient;
-    using System.ComponentModel;
-    using System.ComponentModel.Design;
-    using System.Linq;
-    using System.Xml.Linq;
-    using System.Xml.XPath;
-    using System.Xml;
-    using System.Reflection;
-    using System.Collections.Generic;
-    using CodeSmith.Engine;
-    using SchemaExplorer;
+﻿﻿using System;
+using System.IO;
+using System.Data;
+using System.Data.SqlClient;
+using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Linq;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using System.Xml;
+using System.Reflection;
+using System.Collections.Generic;
+using CodeSmith.Engine;
+using SchemaExplorer;
 
+namespace FullStack.Common
+{
     public class MasterTemplate : CodeTemplate
     {
         #region Constants
@@ -62,7 +62,7 @@
         {
             get
             {
-                return this.ProjectAliases[this.ProjectName];
+                return this.StackProjects[this.ProjectName].Alias;
             }
         }
 
@@ -98,11 +98,7 @@
 
         [Optional]
         [Category("InProcess")]
-        public Dictionary<string, string> ProjectAliases { get; set; }
-
-        [Optional]
-        [Category("InProcess")]
-        public Dictionary<String, Guid> ProjectGuids { get; set; }
+        public Dictionary<String, FullStack.Common.ProjectInfo> StackProjects { get; set; }
         
         [Optional]
         [Category("InProcess")]
@@ -272,6 +268,10 @@
             proj.Save(projectPath);
         }
 
+        /// <summary>
+        /// Clears out a directory
+        /// </summary>
+        /// <param name="path"></param>
         public void ClearDirectory(string path)
         {
             if (!Directory.Exists(path))
@@ -286,12 +286,29 @@
                     this.DeleteFiles(path, "*.sln");
                     this.DeleteFiles(path, "*.csproj");
                     this.DeleteFiles(path, "*.config");
+                    this.DeleteFiles(path, "*.exe");
+                    this.DeleteFiles(path, "*.targets");
                 }
                 // Clean up the existing output directory.
                 this.DeleteFiles(path, "*.cs");
             }
         }
 
+         public void RenderBodyWrite(string renderBodyValue) 
+        {
+            this.RenderBodyWrite(renderBodyValue, string.Empty);
+        }
+        public void RenderBodyWrite(string renderBodyValue, string notRenderBodyValue) {
+            if (this.RenderBody) 
+            { 
+                Response.Write(renderBodyValue);
+            } else 
+            {
+                if (!string.IsNullOrEmpty(notRenderBodyValue)){
+                    Response.Write(notRenderBodyValue);
+                }
+            }
+        }
         public void DeleteFiles(string directory, string searchPattern)
         {
             string[] files = Directory.GetFiles(directory, searchPattern);
@@ -694,8 +711,26 @@
         #endregion
     }
 
+    public class ProjectInfo 
+    {
+        public System.Guid ProjectGuid { get; set; }
+        public FullStack.Common.ProjectType ProjectType { get; set; }
+        public System.String Alias { get; set;}
+        
+        public ProjectInfo(System.String alias, System.Guid projectGuid, FullStack.Common.ProjectType projectType)
+        {
+            this.Alias = alias;
+            this.ProjectGuid = projectGuid;
+            this.ProjectType = projectType;
+        }
+        
+    }
+    
     public enum ProjectType
     {
+        [Description("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")]
+        ASPNET_ONE,
+
         [Description("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")]
         WindowsCSharp,
 

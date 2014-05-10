@@ -9,9 +9,9 @@
 namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
 {
     using System;
-    using  <%= this.SolutionName %>.<%= this.ProjectAliases["Engine"] %>.Models;
+    using  <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;
     
-    internal partial interface I<%= this.GetDataClassName(CurrentTable) %>
+    public partial interface I<%= this.GetDataClassName(CurrentTable) %>
     {
         <% if (this.RenderBody) 
         { // START RENDERBODY

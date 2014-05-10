@@ -29,8 +29,8 @@ public override void Render(TextWriter writer)
         this.CopyPropertiesTo(projectTemplate);
         projectTemplate.RenderToFile(projectLocation, true);    
 
-        string engineAlias = this.ProjectAliases["Engine"];
-        this.AddProjectReferenceToProject(projectLocation, string.Format("../{0}/{0}.csproj",engineAlias), ProjectGuids["Engine"], engineAlias);
+        string engineAlias = this.StackProjects["Engine"].Alias;
+        this.AddProjectReferenceToProject(projectLocation, string.Format("../{0}/{0}.csproj",engineAlias), this.StackProjects["Engine"].ProjectGuid, engineAlias);
         this.CleanupProjectFile(projectLocation);
   
         // Copy Packages

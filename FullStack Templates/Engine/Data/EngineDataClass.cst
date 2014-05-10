@@ -11,15 +11,15 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
     using System;
     using System.Data;
     using PetaPoco;
-    using <% = this.SolutionName %>.<% = this.ProjectAliases["Engine"] %>.Models;
+    using <% = this.SolutionName %>.<% = this.StackProjects["Engine"].Alias %>.Models;
 
     <%-- ONLY RENDER THE INTERFACE IF WE ARE RENDERING THE BODY--%>
-    internal partial class <%= this.GetDataClassName(CurrentTable) %><% if (this.RenderBody) { %> : I<%= this.GetDataClassName(CurrentTable) %><% } %>
+    internal <% this.RenderBodyWrite("abstract"); %> class <% this.RenderBodyWrite(string.Format("{0}Base : I{0}",this.GetDataClassName(CurrentTable)), string.Format("{0} : {0}Base",this.GetDataClassName(CurrentTable))); %> 
     {
         <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
-        public <%= this.GetModelClassName(CurrentTable) %> Create(<%= this.GetModelClassName(CurrentTable) %> model)
+        public virtual <%= this.GetModelClassName(CurrentTable) %> Create(<%= this.GetModelClassName(CurrentTable) %> model)
 		{
 		    using (Database db = DbFactory.GetDatabase())
             {
@@ -33,7 +33,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
             return model;
 		}
         
-         public <%= this.GetModelClassName(CurrentTable) %> Read(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+         public virtual <%= this.GetModelClassName(CurrentTable) %> Read(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
 		{
 		    <%= this.GetModelClassName(CurrentTable) %> model = null;
             using (Database db = DbFactory.GetDatabase())
@@ -44,7 +44,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
             return model;
 		}
         
-        public <%= this.GetModelClassName(CurrentTable) %> Update(<%= this.GetModelClassName(CurrentTable) %> model)
+        public virtual <%= this.GetModelClassName(CurrentTable) %> Update(<%= this.GetModelClassName(CurrentTable) %> model)
 		{
 			using (Database db = DbFactory.GetDatabase())
             {
@@ -54,7 +54,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
             return model;
 		}
         
-        public bool Delete(<%= GetPrimaryKeyType(CurrentTable) %> id)
+        public virtual bool Delete(<%= GetPrimaryKeyType(CurrentTable) %> id)
 		{
             bool result = false;
             using (Database db = DbFactory.GetDatabase())

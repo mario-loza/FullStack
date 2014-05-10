@@ -10,22 +10,22 @@
 namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Services
 {
     using System;
-    using <%= this.SolutionName %>.<%= this.ProjectAliases["Engine"] %>.Models;
-    using <%= this.SolutionName %>.<%= this.ProjectAliases["Engine"] %>.Data;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Data;
     
-    internal partial class <%= this.GetManagerClassName(CurrentTable) %>
+    public <% this.RenderBodyWrite("abstract"); %> class <%= this.GetManagerClassName(CurrentTable) %><% this.RenderBodyWrite("Base", " : " + this.GetManagerClassName(CurrentTable) + "Base"); %>
     {
          <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
         public I<%= this.GetDataClassName(CurrentTable) %> DataService { get; set; }
         
-        public <%= this.GetManagerClassName(CurrentTable) %>()
+        public <%= this.GetManagerClassName(CurrentTable) %>Base()
         {
             this.DataService = new <%= this.GetDataClassName(CurrentTable) %>();
         }
         
-        public <%= this.GetManagerClassName(CurrentTable) %>(I<%= this.GetDataClassName(CurrentTable) %> dataService)
+        public <%= this.GetManagerClassName(CurrentTable) %>Base(I<%= this.GetDataClassName(CurrentTable) %> dataService)
         {
             this.DataService = dataService;
         }

@@ -1,0 +1,28 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="System.Design" %>
+<%@ Assembly Name="System.Linq" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import NameSpace="System.IO" %>
+<%@ Import Namespace="System.Data" %>
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Web.Http;
+
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;
+    
+    internal partial class <%= this.GetModelClassName(CurrentTable) %>Controller : ApiController
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+       // Oh mah gerd! What the what!
+       <% } // END RENDERBODY %>       
+    }
+}
