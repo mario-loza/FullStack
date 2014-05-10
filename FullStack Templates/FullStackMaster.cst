@@ -1,17 +1,10 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" CompilerVersion="v4.0" OutputType="None" %>
+<!-- #include file="Common\HeaderInclude.cst" -->
 <%@ Register Name="EngineMasterTemplate" Template="Engine\EngineMaster.cst" %>
 <%@ Register Name="WebApiMasterTemplate" Template="WebApi\WebApiMaster.cst" %>
 <%@ Register Name="ClientMasterTemplate" Template="Client\ClientMaster.cst" %>
 <%@ Register Name="SolutionTemplate" Template="Resources\SolutionTemplate.cst" %>
 <%@ Register Name="RepositoryTemplate" Template="Resources\RepositoriesTemplate.cst" %>
-<%@ Assembly Name="SchemaExplorer" %>
-<%@ Assembly Name="System.Design" %>
-<%@ Assembly Name="System.Linq" %>
-<%@ Assembly Name="System.Data" %>
-<%@ Assembly Name="System.Xml.Linq" %>
-<%@ Import Namespace="SchemaExplorer" %>
-<%@ Import NameSpace="System.IO" %>
-<%@ Import Namespace="System.Data" %>
 
 <script runat="template">
 public override void Render(TextWriter writer)
@@ -26,8 +19,8 @@ public override void Render(TextWriter writer)
     // Uncomment this code to always wipe the entire directory structure
     if (Directory.Exists(Path.Combine(this.OutputDirectory, this.SolutionName)))
     {
-        //Directory.Delete(Path.Combine(this.OutputDirectory, this.SolutionName), true);
-        //Directory.CreateDirectory(Path.Combine(this.OutputDirectory, this.SolutionName));    
+        Directory.Delete(Path.Combine(this.OutputDirectory, this.SolutionName), true);
+        Directory.CreateDirectory(Path.Combine(this.OutputDirectory, this.SolutionName));    
     }    
     
     // If there is no solution file then we must run all code associated with creating project files

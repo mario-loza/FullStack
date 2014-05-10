@@ -1,4 +1,5 @@
 ﻿<%@ Template Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" %>
+<!-- #include file="..\Common\HeaderInclude.cst" -->
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;

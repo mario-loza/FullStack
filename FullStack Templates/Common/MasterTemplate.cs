@@ -62,7 +62,14 @@ namespace FullStack.Common
         {
             get
             {
-                return this.StackProjects[this.ProjectName].Alias;
+                if (String.IsNullOrEmpty(this.ProjectName)){
+                   return "TotallyUnknown";
+                }
+                
+                if (this.StackProjects.Keys.Contains(this.ProjectName)){
+                    return this.StackProjects[this.ProjectName].Alias;    
+                }
+                throw new Exception(string.Format("Unknown key: [{0}]",this.ProjectName));
             }
         }
 
@@ -309,6 +316,23 @@ namespace FullStack.Common
                 }
             }
         }
+        
+         public void CopyFileToProject(string projectLocation, string relativeSourceFile, string outputSubDir, string outputFileName)
+        {
+            this.CopyFileToProject(projectLocation, relativeSourceFile, outputSubDir, outputFileName, string.Empty);
+        }
+        
+        public void CopyFileToProject(string projectLocation, string relativeSourceFile, string outputSubDir, string outputFileName, string parentFile)
+        {            
+            if (!Directory.Exists(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, outputSubDir)))
+            {
+                Directory.CreateDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, outputSubDir));    
+            }
+            
+            File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName, relativeSourceFile),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, outputSubDir, outputFileName));
+            this.AddFileToProject(projectLocation, outputSubDir, outputFileName, parentFile);
+        }
+        
         public void DeleteFiles(string directory, string searchPattern)
         {
             string[] files = Directory.GetFiles(directory, searchPattern);

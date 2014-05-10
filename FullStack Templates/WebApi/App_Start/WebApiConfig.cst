@@ -1,11 +1,5 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
-<%@ Assembly Name="SchemaExplorer" %>
-<%@ Assembly Name="System.Design" %>
-<%@ Assembly Name="System.Linq" %>
-<%@ Assembly Name="System.Data" %>
-<%@ Import Namespace="SchemaExplorer" %>
-<%@ Import NameSpace="System.IO" %>
-<%@ Import Namespace="System.Data" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
 using System;
 using System.Collections.Generic;
 using System.Linq;

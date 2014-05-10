@@ -1,15 +1,8 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\Common\HeaderInclude.cst" -->
 <%@ Register Name="ClientModelTemplate" Template="Models\ClientModel.cst" %>
-<%@ Register Name="ProjectTemplate" Template="../Resources/EmptyProject.cst" %>
+<%@ Register Name="ProjectTemplate" Template="../Resources/EmptyCsLibraryProject.cst" %>
 <%@ Register Name="AssemblyInfoTemplate" Template="../Resources/AssemblyInfoTemplate.cst" %>
-<%@ Assembly Name="SchemaExplorer" %>
-<%@ Assembly Name="System.Design" %>
-<%@ Assembly Name="System.Linq" %>
-<%@ Assembly Name="System.Data" %>
-<%@ Assembly Name="System.Xml.Linq" %>
-<%@ Import Namespace="SchemaExplorer" %>
-<%@ Import NameSpace="System.IO" %>
-<%@ Import Namespace="System.Data" %>
 
 <script runat="template">
 private int _currentStep = 0;
