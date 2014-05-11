@@ -1,8 +1,20 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
 <!-- #include file="..\Common\HeaderInclude.cst" -->
-<%@ Register Name="ProjectTemplate" Template="../Resources/EmptyCsLibraryProject.cst" %>
+<%@ Register Name="ProjectTemplate" Template="../Resources/EmptyAspNetProject.cst" %>
 <%@ Register Name="AssemblyInfoTemplate" Template="../Resources/AssemblyInfoTemplate.cst" %>
 <%@ Register Name="ControllerTemplate" Template="Controllers/WebApiControllerTemplate.cst" %>
+<%@ Register Name="HomeControllerTemplate" Template="Controllers/HomeController.cst" %>
+<%@ Register Name="ValuesControllerTemplate" Template="Controllers/ValuesController.cst" %>
+
+<%@ Register Name="ViewsWebConfigTemplate" Template="Views/Web.config.cst" %>
+
+<%@ Register Name="GlobalAsaxTemplate" Template="Root/Global.asax.cst" %>
+<%@ Register Name="GlobalAsaxCsTemplate" Template="Root/Global.asax.cs.cst" %>
+
+<%@ Register Name="AppStartBundleConfigTemplate" Template="App_Start/BundleConfig.cst" %>
+<%@ Register Name="AppStartFilterConfigTemplate" Template="App_Start/FilterConfig.cst" %>
+<%@ Register Name="AppStartRouteConfigTemplate" Template="App_Start/RouteConfig.cst" %>
+<%@ Register Name="AppStartWebApiConfigTemplate" Template="App_Start/WebApiConfig.cst" %>
 
 <script runat="template">
 private int _currentStep = 0;
@@ -13,33 +25,57 @@ public override void Render(TextWriter writer)
 {
     
     this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias));
-    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, "Controllers"));
+    this.ClearDirectory(GetProjectOutputDirectory("App_Data"));
+    this.ClearDirectory(GetProjectOutputDirectory("App_Start"));
+    this.ClearDirectory(GetProjectOutputDirectory("Areas"));
+    this.ClearDirectory(GetProjectOutputDirectory("Content"));
+    this.ClearDirectory(GetProjectOutputDirectory("Controllers"));
+    this.ClearDirectory(GetProjectOutputDirectory("fonts"));
+    this.ClearDirectory(GetProjectOutputDirectory("Models"));
+    this.ClearDirectory(GetProjectOutputDirectory("Scripts"));
+    this.ClearDirectory(GetProjectOutputDirectory("Views"));
+    this.ClearDirectory(GetProjectOutputDirectory("Views", "Home"));
+    this.ClearDirectory(GetProjectOutputDirectory("Views", "Shared"));
     
-    string projectLocation = Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, this.CurrentProjectAlias + ".csproj");
+    string projectLocation = GetProjectOutputDirectory(string.Empty, this.CurrentProjectAlias + ".csproj");
    
     if (this.CreateProjectFiles)
     {
-        ProjectTemplate projectTemplate = this.Create<ProjectTemplate>();
-        this.CopyPropertiesTo(projectTemplate);
-        projectTemplate.RenderToFile(projectLocation, true);    
-
+        this.RenderTemplateToFile(this.Create<ProjectTemplate>(), projectLocation);
+        
         string engineAlias = this.StackProjects["Engine"].Alias;
         this.AddProjectReferenceToProject(projectLocation, string.Format("../{0}/{0}.csproj",engineAlias), this.StackProjects["Engine"].ProjectGuid, engineAlias);
        
         //Copy the non-template file
-        this.CopyFileToProject(projectLocation, Path.Combine("Root","Web.config"),string.Empty,"Web.config");
+        this.CopyNonTemplateFilesToFolder("Root",string.Empty);                
+        this.CopyNonTemplateFilesToFolder("Scripts", "Scripts");
+        this.CopyNonTemplateFilesToFolder("fonts", "fonts");
+        this.CopyNonTemplateFilesToFolder("Content", "Content");
+        this.CopyNonTemplateFilesToFolder("Views", "Views");
+        this.CopyNonTemplateFilesToFolder(Path.Combine("Views","Home"), Path.Combine("Views","Home"));
+        this.CopyNonTemplateFilesToFolder(Path.Combine("Views","Shared"), Path.Combine("Views","Shared"));
+      
+        
+        this.RenderTemplateToFile(this.Create<GlobalAsaxTemplate>(), GetProjectOutputDirectory("","Global.asax"));
+        this.RenderTemplateToFile(this.Create<GlobalAsaxCsTemplate>(), GetProjectOutputDirectory("","Global.asax.cs"));
+        
+        this.RenderTemplateToFile(this.Create<HomeControllerTemplate>(), GetProjectOutputDirectory("Controllers","HomeController.cs"));
+        this.RenderTemplateToFile(this.Create<ValuesControllerTemplate>(), GetProjectOutputDirectory("Controllers","ValuesController.cs"));
+        
+        this.RenderTemplateToFile(this.Create<ViewsWebConfigTemplate>(), GetProjectOutputDirectory("Views","Web.config"));
+        
+        this.RenderTemplateToFile(this.Create<AppStartBundleConfigTemplate>(), GetProjectOutputDirectory("App_Start","BundleConfig.cs"));
+        this.RenderTemplateToFile(this.Create<AppStartFilterConfigTemplate>(), GetProjectOutputDirectory("App_Start","FilterConfig.cs"));
+        this.RenderTemplateToFile(this.Create<AppStartRouteConfigTemplate>(), GetProjectOutputDirectory("App_Start","RouteConfig.cs"));
+        this.RenderTemplateToFile(this.Create<AppStartWebApiConfigTemplate>(), GetProjectOutputDirectory("App_Start","WebApiConfig.cs"));
+        
         
         this.CleanupProjectFile(projectLocation);
   
-        // Copy Packages
-        File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"packages.config"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"packages.config"));
+        
     }
 
-    
-    AssemblyInfoTemplate assemblyTemplate = this.Create<AssemblyInfoTemplate>();
-    this.CopyPropertiesTo(assemblyTemplate);
-    string assemblyTemplateLocation = Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Properties","AssemblyInfo.cs");
-    assemblyTemplate.RenderToFile(assemblyTemplateLocation, true);
+    RenderTemplateToFile(this.Create<AssemblyInfoTemplate>(), Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Properties","AssemblyInfo.cs"));
     
     _totalTableCount = this.SourceDatabase.Tables.Count;
     _currentTableCount = 0;
@@ -56,6 +92,34 @@ public override void Render(TextWriter writer)
             this.BuildCurrentTableTemplate(this.Create<ControllerTemplate>(), projectLocation,"Controllers","{0}Controller.gen.cs","{0}Controller.cs");            
         }
     }
+}
+
+public void CopyNonTemplateFilesToFolder(string relativeSourceDirectory, string relativeTargetDirectory)
+{
+    foreach (var rootFile in Directory.EnumerateFiles(Path.Combine(this.CodeTemplateInfo.DirectoryName,relativeSourceDirectory)))
+	{
+        System.IO.FileInfo fi = new System.IO.FileInfo(rootFile);
+        if (!fi.Name.EndsWith(".cst")){
+            File.Copy(fi.FullName,GetProjectOutputDirectory(relativeTargetDirectory, fi.Name));           
+        }
+		
+	}
+}
+
+public string GetProjectOutputDirectory(string relativeTargetDirectory)
+{
+    return Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, relativeTargetDirectory);   
+}
+
+public string GetProjectOutputDirectory(string relativeTargetDirectory, string fileName)
+{
+    return Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, relativeTargetDirectory, fileName);   
+}
+
+
+public void RenderTemplateToFile(CodeSmith.Engine.CodeTemplate template, string destination){
+    this.CopyPropertiesTo(template);
+    template.RenderToFile(destination, true);
 }
 
 </script>

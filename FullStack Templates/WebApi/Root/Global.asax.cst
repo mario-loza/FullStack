@@ -1,0 +1,10 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+<% = GetHeader() %>
+<script runat="template">
+public string GetHeader()
+{
+    return string.Format("<%@ Application Codebehind=\"Global.asax.cs\" Inherits=\"{0}.{1}.WebApiApplication\" Language=\"C#\" %>",this.SolutionName,this.CurrentProjectAlias);
+
+}
+</script>

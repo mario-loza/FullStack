@@ -11,7 +11,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models
     [PetaPoco.PrimaryKey("<%= GetPrimaryKeyName(CurrentTable) %>")]
     [PetaPoco.TableName("<%= CurrentTable.Name %>")]
      <% } // END RENDERBODY %>
-    internal partial class <%= this.GetModelClassName(CurrentTable) %>
+    public partial class <%= this.GetModelClassName(CurrentTable) %>
     {
         <% if (this.RenderBody) 
         { // START RENDERBODY

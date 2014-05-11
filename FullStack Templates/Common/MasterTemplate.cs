@@ -317,7 +317,7 @@ namespace FullStack.Common
             }
         }
         
-         public void CopyFileToProject(string projectLocation, string relativeSourceFile, string outputSubDir, string outputFileName)
+        public void CopyFileToProject(string projectLocation, string relativeSourceFile, string outputSubDir, string outputFileName)
         {
             this.CopyFileToProject(projectLocation, relativeSourceFile, outputSubDir, outputFileName, string.Empty);
         }
