@@ -89,7 +89,7 @@ public override void Render(TextWriter writer)
         {
             _currentStep = 1;
              
-            this.BuildCurrentTableTemplate(this.Create<ControllerTemplate>(), projectLocation,"Controllers","{0}Controller.gen.cs","{0}Controller.cs");            
+            this.BuildCurrentTableTemplate(this.Create<ControllerTemplate>(), projectLocation,"Controllers",string.Format("{0}Controller.gen.cs", this.CurrentTable.Name),string.Format("{0}Controller.cs", this.CurrentTable.Name));            
         }
     }
 }

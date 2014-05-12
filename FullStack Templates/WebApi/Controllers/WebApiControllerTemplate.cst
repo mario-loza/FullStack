@@ -14,19 +14,19 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;     
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services;
     
-    public partial class <%= this.GetClassName(CurrentTable) %>Controller <% this.RenderBodyWrite(": ApiController",string.Empty); %>
+    public partial class <%= CurrentTable.Name %>Controller <% this.RenderBodyWrite(": ApiController",string.Empty); %>
     {
         <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
             public I<%= this.GetManagerClassName(CurrentTable) %> ManagerService { get; set; }
             
-            public <%= this.GetClassName(CurrentTable) %>Controller()
+            public <%= CurrentTable.Name %>Controller()
             {
                 this.ManagerService = new <%= this.GetManagerClassName(CurrentTable) %>();
             }
             
-            public <%= this.GetClassName(CurrentTable) %>Controller(I<%= this.GetManagerClassName(CurrentTable) %> managerService)
+            public <%= CurrentTable.Name %>Controller(I<%= this.GetManagerClassName(CurrentTable) %> managerService)
             {
                 if (managerService == null) 
                 {
