@@ -5,7 +5,8 @@
 <%@ Register Name="EngineDataClassTemplate" Template="Data\EngineDataClass.cst" %>
 <%@ Register Name="EngineDataInterfaceTemplate" Template="Data\EngineDataInterface.cst" %>
 <%@ Register Name="EngineModelsTemplate" Template="Models\EngineModel.cst" %>
-<%@ Register Name="EngineServicesTemplate" Template="Services\EngineService.cst" %>
+<%@ Register Name="EngineManagerTemplate" Template="Services\EngineManager.cst" %>
+<%@ Register Name="EngineManagerInterfaceTemplate" Template="Services\EngineManagerInterface.cst" %>
 <%@ Register Name="ProjectTemplate" Template="../Resources/EmptyCsLibraryProject.cst" %>
 <%@ Register Name="AssemblyInfoTemplate" Template="../Resources/AssemblyInfoTemplate.cst" %>
 <script runat="template">
@@ -63,7 +64,8 @@ public override void Render(TextWriter writer)
             this.BuildCurrentTableTemplate(this.Create<EngineModelsTemplate>(),projectLocation,"Models","{0}Model.gen.cs","{0}Model.cs");
             this.BuildCurrentTableTemplate(this.Create<EngineDataClassTemplate>(),projectLocation,"Data","{0}DataBase.gen.cs","{0}Data.cs");
             this.BuildCurrentTableTemplate(this.Create<EngineDataInterfaceTemplate>(),projectLocation,"Data","I{0}Data.gen.cs","I{0}Data.cs");
-            this.BuildCurrentTableTemplate(this.Create<EngineServicesTemplate>(),projectLocation,"Services","{0}ManagerBase.gen.cs","{0}Manager.cs");
+            this.BuildCurrentTableTemplate(this.Create<EngineManagerTemplate>(),projectLocation,"Services","{0}ManagerBase.gen.cs","{0}Manager.cs");
+            this.BuildCurrentTableTemplate(this.Create<EngineManagerInterfaceTemplate>(),projectLocation,"Services","I{0}Manager.gen.cs","I{0}Manager.cs");            
          }
     }
 }

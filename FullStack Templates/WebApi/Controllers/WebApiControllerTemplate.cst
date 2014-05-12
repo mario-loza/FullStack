@@ -8,15 +8,69 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
     using System.Net;
     using System.Net.Http;
     using System.Web.Http;
-
-    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;
     
-    internal partial class <%= this.GetModelClassName(CurrentTable) %>Controller : ApiController
+    using Newtonsoft.Json;
+
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;     
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services;
+    
+    public partial class <%= this.GetClassName(CurrentTable) %>Controller <% this.RenderBodyWrite(": ApiController",string.Empty); %>
     {
         <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
-       // Oh mah gerd! What the what!
+            public I<%= this.GetManagerClassName(CurrentTable) %> ManagerService { get; set; }
+            
+            public <%= this.GetClassName(CurrentTable) %>Controller()
+            {
+                this.ManagerService = new <%= this.GetManagerClassName(CurrentTable) %>();
+            }
+            
+            public <%= this.GetClassName(CurrentTable) %>Controller(I<%= this.GetManagerClassName(CurrentTable) %> managerService)
+            {
+                if (managerService == null) 
+                {
+                    this.ManagerService = new <%= this.GetManagerClassName(CurrentTable) %>();
+                }
+                else 
+                {
+                    this.ManagerService = managerService;
+                }
+            }
+        
+           public IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> Get()
+            {
+                return this.ManagerService.Read();                
+            }
+
+            // GET api/<%= this.GetClassName(CurrentTable) %>/5
+            public <%= this.GetModelClassName(CurrentTable) %> Get(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+            {
+                return this.ManagerService.Read(id);
+            }
+
+            // POST api/<%= this.GetClassName(CurrentTable) %>
+            public void Post([FromBody]string value)
+            {
+                <%= this.GetModelClassName(CurrentTable) %> model = JsonConvert.DeserializeObject<<%= this.GetModelClassName(CurrentTable) %>>(value);
+                this.ManagerService.Create(model);
+            }
+
+            // PUT api/<%= this.GetClassName(CurrentTable) %>/5
+            public void Put(<%= this.GetPrimaryKeyType(CurrentTable) %> id, [FromBody]string value)
+            {
+                <%= this.GetModelClassName(CurrentTable) %> model = JsonConvert.DeserializeObject<<%= this.GetModelClassName(CurrentTable) %>>(value);
+                this.ManagerService.Update(model);
+            }
+
+            // DELETE api/<%= this.GetClassName(CurrentTable) %>/5
+            public void Delete(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+            {
+                this.ManagerService.Delete(id);
+            }
        <% } // END RENDERBODY %>       
     }
 }
+<script runat="template">
+
+</script>

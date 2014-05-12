@@ -1,0 +1,75 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Services
+{
+    using System;
+    using System.Collections.Generic;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Data;
+    
+    public <% this.RenderBodyWrite("abstract"); %> class <% this.RenderBodyWrite(string.Format("{0}Base : I{0}",this.GetManagerClassName(CurrentTable)), string.Format("{0} : {0}Base",this.GetManagerClassName(CurrentTable))); %> 
+    {
+         <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+            public I<%= this.GetDataClassName(CurrentTable) %> DataService { get; set; }
+            
+            public <%= this.GetManagerClassName(CurrentTable) %>Base()
+            {
+                this.DataService = new <%= this.GetDataClassName(CurrentTable) %>();
+            }
+            
+            public <%= this.GetManagerClassName(CurrentTable) %>Base(I<%= this.GetDataClassName(CurrentTable) %> dataService)
+            {
+                if (dataService == null) 
+                {
+                    this.DataService = new <%= this.GetDataClassName(CurrentTable) %>();
+                }
+                else 
+                {
+                    this.DataService = dataService;
+                }
+            }
+            
+            public virtual <%= this.GetModelClassName(CurrentTable) %> Create(<%= this.GetModelClassName(CurrentTable) %> model)
+            {
+                return this.DataService.Create(model);           
+            }
+        
+            public virtual IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> Read()
+            {
+                return this.DataService.Read();
+            }
+            
+            public virtual <%= this.GetModelClassName(CurrentTable) %> Read(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+            {
+                return this.DataService.Read(id);
+            }
+
+            public virtual <%= this.GetModelClassName(CurrentTable) %> Update(<%= this.GetModelClassName(CurrentTable) %> model)
+            {
+                return this.DataService.Update(model);
+            }
+
+            public virtual bool Delete(<%= GetPrimaryKeyType(CurrentTable) %> id)
+            {
+                return this.DataService.Delete(id);
+            }
+            
+        <% } // END RENDERBODY 
+            else
+            {
+        %>            
+            public <%= this.GetManagerClassName(CurrentTable) %>() : base()
+            {                
+            }
+            
+            public <%= this.GetManagerClassName(CurrentTable) %>(I<%= this.GetDataClassName(CurrentTable) %> dataService) : base(dataService)
+            {                
+            }
+        <% } // END RENDERBODY %>        
+    }
+}
+<script runat="template">
+
+</script>

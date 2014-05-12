@@ -3,6 +3,7 @@
 namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
 {
     using System;
+    using System.Collections.Generic;
     using  <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;
     
     public partial interface I<%= this.GetDataClassName(CurrentTable) %>
@@ -11,6 +12,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
         { // START RENDERBODY
         %>
         <%= this.GetModelClassName(CurrentTable) %> Create(<%= this.GetModelClassName(CurrentTable) %> model);
+        IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> Read();
 		<%= this.GetModelClassName(CurrentTable) %> Read(<%= this.GetPrimaryKeyType(CurrentTable) %> id);
 		<%= this.GetModelClassName(CurrentTable) %> Update(<%= this.GetModelClassName(CurrentTable) %> model);
 		bool Delete(<%= GetPrimaryKeyType(CurrentTable) %> id);

@@ -3,7 +3,8 @@
 namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
 {
     using System;
-    using System.Data;
+    using System.Collections.Generic;
+    using System.Data;    
     using PetaPoco;
     using <% = this.SolutionName %>.<% = this.StackProjects["Engine"].Alias %>.Models;
 
@@ -27,7 +28,18 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
             return model;
 		}
         
-         public virtual <%= this.GetModelClassName(CurrentTable) %> Read(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        public virtual IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> Read()
+		{
+		    IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> models = null;
+            using (Database db = DbFactory.GetDatabase())
+            {
+                models = db.SkipTake<<%= this.GetModelClassName(CurrentTable) %>>(0, 1000,"SELECT * FROM [<%= CurrentTable.Name %>]");
+            }
+
+            return models;
+		}
+        
+        public virtual <%= this.GetModelClassName(CurrentTable) %> Read(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
 		{
 		    <%= this.GetModelClassName(CurrentTable) %> model = null;
             using (Database db = DbFactory.GetDatabase())

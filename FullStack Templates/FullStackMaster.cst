@@ -30,11 +30,11 @@ public override void Render(TextWriter writer)
     }
     
     // Clear out the base directory and create it if it doesn't exist
-    this.ClearDirectory(this.OutputDirectory);
  
-   
     if (this.CreateProjectFiles) 
     {
+        this.ClearDirectory(this.OutputDirectory);
+ 
         // Create the Solution (SLN) file
         var solutionTemplate = this.Create<SolutionTemplate>();
         this.CopyPropertiesTo(solutionTemplate);
