@@ -14,7 +14,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models
     
         public <%= GetPrimaryKeyType(CurrentTable) %> Id { get; set; }
 		<% for (int i = 0; i < CurrentTable.NonPrimaryKeyColumns.Count; i++) { %>
-		public <%= GetCSharpVariableType(CurrentTable.NonPrimaryKeyColumns[i]) %> <%= GetPropertyName(CurrentTable.NonPrimaryKeyColumns[i]) %> { get; set; }
+        public <%= GetCSharpVariableType(CurrentTable.NonPrimaryKeyColumns[i]) %> <%= GetPropertyName(CurrentTable.NonPrimaryKeyColumns[i]) %> { get; set; }
 		<% if (i < CurrentTable.NonPrimaryKeyColumns.Count - 1) Response.Write("\r\n"); %>		
 		<% } %>
         

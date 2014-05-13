@@ -10,7 +10,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
     using Newtonsoft.Json;
    
     using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api;
-    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models;
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models;
     
     public partial class Authentication
     {

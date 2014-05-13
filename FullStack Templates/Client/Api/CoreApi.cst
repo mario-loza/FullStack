@@ -30,9 +30,12 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
             <%
             foreach(TableSchema table in this.SourceDatabase.Tables)
             {
-            %>
-            this.<% = table.Name %> = new <% = table.Name %>Api();
+                if (this.HasValidPrimaryKey(table))
+                {
+            %>            
+            this.<% = this.GetClassName(table) %> = new <% = this.GetClassName(table) %>Api();
             <%
+                }
             } // END LOOPING THROUGH TABLES
             %>
         }
@@ -41,12 +44,15 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
 
         #region Properties
 
-         <%
+        <%
         foreach(TableSchema table in this.SourceDatabase.Tables)
         {
+            if (this.HasValidPrimaryKey(table))
+            {
         %>
-        public <% = table.Name %>Api <% = table.Name %> { get; private set; }
+        public <% = this.GetClassName(table) %>Api <% = this.GetClassName(table) %> { get; private set; }
         <%
+            }
         } // END LOOPING THROUGH TABLES
         %>
        

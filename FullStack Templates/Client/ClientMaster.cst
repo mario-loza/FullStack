@@ -7,6 +7,7 @@
 <%@ Register Name="AuthenticationTemplate" Template="Root\Authentication.cst" %>
 <%@ Register Name="ApiCredentialsTemplate" Template="Api\ApiCredentials.cst" %>
 <%@ Register Name="CoreApiTemplate" Template="Api\CoreApi.cst" %>
+<%@ Register Name="ClassApiTemplate" Template="Api\ClassApi.cst" %>
 <%@ Register Name="ApiResponseTemplate" Template="Api\Models\ApiResponse.cst" %>
 <%@ Register Name="AuthorizationTokenTemplate" Template="Api\Models\AuthorizationToken.cst" %>
 <%@ Register Name="ApiBaseTemplate" Template="Common\ApiBase.cst" %>
@@ -31,7 +32,11 @@ public override void Render(TextWriter writer)
         ProjectTemplate projectTemplate = this.Create<ProjectTemplate>();
         this.CopyPropertiesTo(projectTemplate);
         projectTemplate.RenderToFile(projectLocation, true);
-
+        
+        this.AddAssemblyToProject(projectLocation, "System.Net.Http");
+        this.AddAssemblyToProject(projectLocation, "System.Net.Http.Formatting");
+        this.AddAssemblyToProject(projectLocation, "Newtonsoft.Json");
+        
         this.CleanupProjectFile(projectLocation);
 
         // Copy Packages
@@ -62,7 +67,7 @@ public override void Render(TextWriter writer)
         if (this.HasValidPrimaryKey(this.CurrentTable))
         {
             _currentStep = 1;
-             
+            this.BuildCurrentTableTemplate(this.Create<ClassApiTemplate>(),projectLocation,@"Api","{0}Api.gen.cs","{0}Api.cs");
             this.BuildCurrentTableTemplate(this.Create<ClientModelTemplate>(),projectLocation,@"Api\Models","{0}Model.gen.cs","{0}Model.cs");
         }
     }
