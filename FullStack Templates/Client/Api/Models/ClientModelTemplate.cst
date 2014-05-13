@@ -1,6 +1,7 @@
-﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
-<!-- #include file="..\..\Common\HeaderInclude.cst" -->
-namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\..\Common\HeaderInclude.cst" -->
+
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models
 {
     using System;
     

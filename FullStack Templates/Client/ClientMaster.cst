@@ -1,8 +1,17 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
 <!-- #include file="..\Common\HeaderInclude.cst" -->
-<%@ Register Name="ClientModelTemplate" Template="Models\ClientModel.cst" %>
-<%@ Register Name="ProjectTemplate" Template="../Resources/EmptyCsLibraryProject.cst" %>
-<%@ Register Name="AssemblyInfoTemplate" Template="../Resources/AssemblyInfoTemplate.cst" %>
+<%@ Register Name="ClientModelTemplate" Template="Api\Models\ClientModelTemplate.cst" %>
+<%@ Register Name="ProjectTemplate" Template="..\Resources\EmptyCsLibraryProject.cst" %>
+<%@ Register Name="AssemblyInfoTemplate" Template="..\Resources\AssemblyInfoTemplate.cst" %>
+
+<%@ Register Name="AuthenticationTemplate" Template="Root\Authentication.cst" %>
+<%@ Register Name="ApiCredentialsTemplate" Template="Api\ApiCredentials.cst" %>
+<%@ Register Name="CoreApiTemplate" Template="Api\CoreApi.cst" %>
+<%@ Register Name="ApiResponseTemplate" Template="Api\Models\ApiResponse.cst" %>
+<%@ Register Name="AuthorizationTokenTemplate" Template="Api\Models\AuthorizationToken.cst" %>
+<%@ Register Name="ApiBaseTemplate" Template="Common\ApiBase.cst" %>
+<%@ Register Name="LogTemplate" Template="Common\Log.cst" %>
+
 
 <script runat="template">
 private int _currentStep = 0;
@@ -12,7 +21,9 @@ private int _totalTableCount = 0;
 public override void Render(TextWriter writer)
 {    
     this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias));
-    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Api"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Api","Models"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Common"));
        
     string projectLocation = Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Client.csproj");
     if (this.CreateProjectFiles)
@@ -20,11 +31,19 @@ public override void Render(TextWriter writer)
         ProjectTemplate projectTemplate = this.Create<ProjectTemplate>();
         this.CopyPropertiesTo(projectTemplate);
         projectTemplate.RenderToFile(projectLocation, true);
-        
+
         this.CleanupProjectFile(projectLocation);
-        
+
         // Copy Packages
-        File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"packages.config"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"packages.config"));
+        this.CopyNonTemplateFilesToFolder("Root",string.Empty);
+
+        this.BuildTemplate(this.Create<AuthenticationTemplate>(), projectLocation, string.Empty, "Authentication.gen.cs", "Authentication.cs");
+        this.BuildTemplate(this.Create<ApiCredentialsTemplate>(), projectLocation, "Api", "ApiCredentials.gen.cs", "ApiCredentials.cs");
+        this.BuildTemplate(this.Create<CoreApiTemplate>(), projectLocation, "Api", this.ApiClassAlias + ".gen.cs", this.ApiClassAlias + ".cs");
+        this.BuildTemplate(this.Create<ApiResponseTemplate>(), projectLocation, @"Api\Models", "ApiResponse.gen.cs", "ApiResponse.cs");
+        this.BuildTemplate(this.Create<AuthorizationTokenTemplate>(), projectLocation, @"Api\Models", "AuthorizationToken.gen.cs", "AuthorizationToken.cs");
+        this.BuildTemplate(this.Create<ApiBaseTemplate>(), projectLocation, "Common", "ApiBase.gen.cs", "ApiBase.cs");
+        this.BuildTemplate(this.Create<LogTemplate>(), projectLocation, "Common", "Log.gen.cs", "Log.cs");
     }
     
     AssemblyInfoTemplate assemblyTemplate = this.Create<AssemblyInfoTemplate>();
@@ -44,7 +63,7 @@ public override void Render(TextWriter writer)
         {
             _currentStep = 1;
              
-            this.BuildCurrentTableTemplate(this.Create<ClientModelTemplate>(),projectLocation,"Models","{0}Model.gen.cs","{0}Model.cs");
+            this.BuildCurrentTableTemplate(this.Create<ClientModelTemplate>(),projectLocation,@"Api\Models","{0}Model.gen.cs","{0}Model.cs");
         }
     }
 }

@@ -30,7 +30,7 @@ public override void Render(TextWriter writer)
         this.CleanupProjectFile(projectLocation);
         
         // Copy Packages
-        File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"packages.config"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"packages.config"));
+        this.CopyNonTemplateFilesToFolder("Root",string.Empty);       
     }
     
     AssemblyInfoTemplate assemblyTemplate = this.Create<AssemblyInfoTemplate>();

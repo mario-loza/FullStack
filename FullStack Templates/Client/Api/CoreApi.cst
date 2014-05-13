@@ -1,0 +1,56 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
+{
+    using System;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models;
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common;
+       
+    public partial class <% = this.ApiClassAlias %> : ApiBase
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+          #region Constructors and Destructors
+
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="<% = this.ApiClassAlias %>"/> class.
+        /// </summary>
+        /// <param name="sessionKey"></param>
+        /// <param name="sessionExpiration"></param>
+        /// <param name="url"></param>
+        internal <% = this.ApiClassAlias %>(string sessionKey, DateTime sessionExpiration, string url)
+        {
+            ApiCredentials.SetCredentials(sessionKey, sessionExpiration, url);
+
+            <%
+            foreach(TableSchema table in this.SourceDatabase.Tables)
+            {
+            %>
+            this.<% = table.Name %> = new <% = table.Name %>Api();
+            <%
+            } // END LOOPING THROUGH TABLES
+            %>
+        }
+
+        #endregion
+
+        #region Properties
+
+         <%
+        foreach(TableSchema table in this.SourceDatabase.Tables)
+        {
+        %>
+        public <% = table.Name %>Api <% = table.Name %> { get; private set; }
+        <%
+        } // END LOOPING THROUGH TABLES
+        %>
+       
+        #endregion
+        <% } // END RENDERBODY %>        
+    }
+}

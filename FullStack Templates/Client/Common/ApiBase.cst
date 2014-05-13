@@ -1,0 +1,52 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
+{
+    using System;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api;
+    
+    public abstract partial class ApiBase
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+         #region Public Properties
+
+        public DateTime SessionExpiration
+        {
+            get
+            {
+                return ApiCredentials.SessionExpiration;
+            }
+        }
+
+        public string SessionKey
+        {
+            get
+            {
+                return ApiCredentials.SessionKey;
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        protected HttpClient GetHttpClient()
+        {
+            var client = new HttpClient();
+
+            client.BaseAddress = new Uri(ApiCredentials.ApiUrl);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            return client;
+        }
+
+        #endregion
+        <% } // END RENDERBODY %>        
+    }
+}

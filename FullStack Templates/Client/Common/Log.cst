@@ -1,0 +1,41 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
+{
+    using System;
+     
+    public static partial class Log
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+        #region Public Methods and Operators
+
+        public static void Debug(string message)
+        {
+        }
+
+        public static void Error(string message)
+        {
+        }
+
+        public static void Exception(Exception ex)
+        {
+        }
+
+        public static void Fatal(string message)
+        {
+        }
+
+        public static void Information(string message)
+        {
+        }
+
+        public static void Warning(string message)
+        {
+        }
+
+        #endregion
+        <% } // END RENDERBODY %>        
+    }
+}

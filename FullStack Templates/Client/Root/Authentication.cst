@@ -1,0 +1,69 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
+{
+    using System;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Threading.Tasks;
+
+    using Newtonsoft.Json;
+   
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api;
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models;
+    
+    public partial class Authentication
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+        public static async Task<<% = this.ApiClassAlias %>> Login(string username, string password, string apiBaseUrl)
+        {
+            <% = this.ApiClassAlias %> api = null;
+            try
+            {
+                using (var client = GetHttpClient(apiBaseUrl))
+                {
+                    var body = new { username, password };
+                    HttpResponseMessage response = await client.PostAsJsonAsync("authentication", body);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string jsonResult = await response.Content.ReadAsStringAsync();
+                        ApiResponse<AuthorizationToken> apiResponse = JsonConvert.DeserializeObject<ApiResponse<AuthorizationToken>>(jsonResult);
+
+                        if (!apiResponse.IsError)
+                        {
+                            api = new <% = this.ApiClassAlias %>(apiResponse.Result.SessionKey, apiResponse.Result.Expiration, apiBaseUrl);
+                            
+                        }
+                        
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ApiCredentials.ClearCredentials();
+
+                throw;
+            }
+
+            return api;
+        }
+
+
+
+        private static HttpClient GetHttpClient(string baseUrl)
+        {
+            HttpClient client = new HttpClient();
+
+            ApiCredentials.SetCredentials(string.Empty, DateTime.UtcNow.AddDays(-5), baseUrl);
+
+            client.BaseAddress = new Uri(ApiCredentials.ApiUrl);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            return client;
+        }
+        <% } // END RENDERBODY %>        
+    }
+}

@@ -34,8 +34,7 @@ namespace FullStack.Common
         public MapCollection SqlNativeSqlDb = Map.LoadFromName("SqlNativeType-SqlDbType"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
 
         private string _outputDirectory = String.Empty;
-        
-     
+
         #endregion
 
         #region Constructors and Destructors
@@ -49,6 +48,14 @@ namespace FullStack.Common
 
         #region Public Properties
 
+        public string ApiClassAlias
+        {
+            get
+            {
+                return string.Format("{0}Api", this.SolutionName);
+            }
+        }
+        
         [Category("Context")]
         public string CompanyName { get; set; }
 
@@ -62,14 +69,16 @@ namespace FullStack.Common
         {
             get
             {
-                if (String.IsNullOrEmpty(this.ProjectName)){
-                   return "TotallyUnknown";
+                if (String.IsNullOrEmpty(this.ProjectName))
+                {
+                    return "TotallyUnknown";
                 }
-                
-                if (this.StackProjects.Keys.Contains(this.ProjectName)){
-                    return this.StackProjects[this.ProjectName].Alias;    
+
+                if (this.StackProjects.Keys.Contains(this.ProjectName))
+                {
+                    return this.StackProjects[this.ProjectName].Alias;
                 }
-                throw new Exception(string.Format("Unknown key: [{0}]",this.ProjectName));
+                throw new Exception(string.Format("Unknown key: [{0}]", this.ProjectName));
             }
         }
 
@@ -105,21 +114,21 @@ namespace FullStack.Common
 
         [Optional]
         [Category("InProcess")]
-        public Dictionary<String, FullStack.Common.ProjectInfo> StackProjects { get; set; }
-        
-        [Optional]
-        [Category("InProcess")]
-        public bool RenderBody { get; set; }
+        public string ProjectName { get; set; }
 
         [Optional]
         [Category("InProcess")]
-        public string ProjectName { get; set; }
+        public bool RenderBody { get; set; }
 
         [Category("Context")]
         public string SolutionName { get; set; }
 
         [Category("Context")]
         public SchemaExplorer.DatabaseSchema SourceDatabase { get; set; }
+
+        [Optional]
+        [Category("InProcess")]
+        public Dictionary<String, ProjectInfo> StackProjects { get; set; }
 
         #endregion
 
@@ -176,7 +185,7 @@ namespace FullStack.Common
         ///     The name of the parent to group the file to, an
         ///     empty string if there is no parent file
         /// </param>
-        public void  AddFileToProject(string projectPath, string projectSubDir, string file, string parent)
+        public void AddFileToProject(string projectPath, string projectSubDir, string file, string parent)
         {
             XDocument proj = XDocument.Load(projectPath);
 
@@ -249,6 +258,23 @@ namespace FullStack.Common
             proj.Save(projectPath);
         }
 
+        public void BuildCurrentTableTemplate(CodeTemplate template, string projectLocation, string subFolderPath, string generatedFileNameFormat, string parentFileNameFormat)
+        {
+            if (!string.IsNullOrEmpty(parentFileNameFormat))
+            {
+                this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, subFolderPath, parentFileNameFormat));
+                this.AddFileToProject(projectLocation, subFolderPath, string.Format(parentFileNameFormat, this.GetClassName(this.CurrentTable)), string.Empty);
+
+                this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, subFolderPath, generatedFileNameFormat));
+                this.AddFileToProject(projectLocation, subFolderPath, string.Format(generatedFileNameFormat, this.GetClassName(this.CurrentTable)), string.Format(parentFileNameFormat, this.GetClassName(this.CurrentTable)));
+            }
+            else
+            {
+                this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, subFolderPath, generatedFileNameFormat));
+                this.AddFileToProject(projectLocation, subFolderPath, string.Format(generatedFileNameFormat, this.GetClassName(this.CurrentTable)), string.Empty);
+            }
+        }
+
         public void CleanupProjectFile(string projectPath)
         {
             XDocument proj = XDocument.Load(projectPath);
@@ -276,7 +302,7 @@ namespace FullStack.Common
         }
 
         /// <summary>
-        /// Clears out a directory
+        ///     Clears out a directory
         /// </summary>
         /// <param name="path"></param>
         public void ClearDirectory(string path)
@@ -301,38 +327,34 @@ namespace FullStack.Common
             }
         }
 
-         public void RenderBodyWrite(string renderBodyValue) 
-        {
-            this.RenderBodyWrite(renderBodyValue, string.Empty);
-        }
-        public void RenderBodyWrite(string renderBodyValue, string notRenderBodyValue) {
-            if (this.RenderBody) 
-            { 
-                Response.Write(renderBodyValue);
-            } else 
-            {
-                if (!string.IsNullOrEmpty(notRenderBodyValue)){
-                    Response.Write(notRenderBodyValue);
-                }
-            }
-        }
-        
         public void CopyFileToProject(string projectLocation, string relativeSourceFile, string outputSubDir, string outputFileName)
         {
             this.CopyFileToProject(projectLocation, relativeSourceFile, outputSubDir, outputFileName, string.Empty);
         }
-        
+
         public void CopyFileToProject(string projectLocation, string relativeSourceFile, string outputSubDir, string outputFileName, string parentFile)
-        {            
-            if (!Directory.Exists(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, outputSubDir)))
+        {
+            if (!Directory.Exists(Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, outputSubDir)))
             {
-                Directory.CreateDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, outputSubDir));    
+                Directory.CreateDirectory(Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, outputSubDir));
             }
-            
-            File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName, relativeSourceFile),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, outputSubDir, outputFileName));
+
+            File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName, relativeSourceFile), Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, outputSubDir, outputFileName));
             this.AddFileToProject(projectLocation, outputSubDir, outputFileName, parentFile);
         }
-        
+
+        public void CopyNonTemplateFilesToFolder(string relativeSourceDirectory, string relativeTargetDirectory)
+        {
+            foreach (string rootFile in Directory.EnumerateFiles(Path.Combine(this.CodeTemplateInfo.DirectoryName, relativeSourceDirectory)))
+            {
+                var fi = new FileInfo(rootFile);
+                if (!fi.Name.EndsWith(".cst"))
+                {
+                    File.Copy(fi.FullName, this.GetProjectOutputDirectory(relativeTargetDirectory, fi.Name));
+                }
+            }
+        }
+
         public void DeleteFiles(string directory, string searchPattern)
         {
             string[] files = Directory.GetFiles(directory, searchPattern);
@@ -347,6 +369,25 @@ namespace FullStack.Common
                 {
                     Response.WriteLine("Error while attempting to delete file (" + files[i] + ").\r\n" + ex.Message);
                 }
+            }
+        }
+
+        public void ExecuteTemplate(CodeTemplate template, string formatPath)
+        {
+            this.CopyPropertiesTo(template);
+            var masterTemplate = template as MasterTemplate;
+            if (masterTemplate != null)
+            {
+                masterTemplate.RenderBody = formatPath.Contains(".gen.");
+            }
+
+            if (formatPath.Contains("{0}"))
+            {
+                template.RenderToFile(string.Format(formatPath, this.GetClassName(this.CurrentTable)), true);
+            }
+            else
+            {
+                template.RenderToFile(formatPath, true);
             }
         }
 
@@ -530,6 +571,16 @@ namespace FullStack.Common
             }
         }
 
+        public string GetProjectOutputDirectory(string relativeTargetDirectory)
+        {
+            return Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, relativeTargetDirectory);
+        }
+
+        public string GetProjectOutputDirectory(string relativeTargetDirectory, string fileName)
+        {
+            return Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, relativeTargetDirectory, fileName);
+        }
+
         public string GetProjectTypeGuid(ProjectType en)
         {
             Type type = en.GetType();
@@ -623,6 +674,14 @@ namespace FullStack.Common
             return result;
         }
 
+        public void OnProgress(object sender, ProgressEventArgs e)
+        {
+            //if (e.Value > 0)
+            //{
+            //    this.Progress.Value = 75 + (_currentStep * 100) + (int)(((Double)e.Value / (Double)e.MaximumValue) * 100);
+            //}
+        }
+
         public void OutputExceptionInformation(Exception exception, int indentLevel)
         {
             int originalIndentLevel = Response.IndentLevel;
@@ -687,69 +746,76 @@ namespace FullStack.Common
             template.Render(this.Response);
         }
 
-                
-        public void BuildCurrentTableTemplate(CodeTemplate template, string projectLocation, string subFolderPath, string generatedFileNameFormat, string parentFileNameFormat)
+        public void RenderBodyWrite(string renderBodyValue)
         {
-                    if (!string.IsNullOrEmpty(parentFileNameFormat))
-                    {
-                        this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,subFolderPath, parentFileNameFormat)); 
-                        this.AddFileToProject(projectLocation,subFolderPath,string.Format(parentFileNameFormat, this.GetClassName(this.CurrentTable)), string.Empty);
-                    
-                        this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,subFolderPath, generatedFileNameFormat)); 
-                        this.AddFileToProject(projectLocation,subFolderPath,string.Format(generatedFileNameFormat, this.GetClassName(this.CurrentTable)), string.Format(parentFileNameFormat,this.GetClassName(this.CurrentTable)));
-
-                    }
-                    else 
-                    {
-                        this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,subFolderPath, generatedFileNameFormat)); 
-                        this.AddFileToProject(projectLocation,subFolderPath,string.Format(generatedFileNameFormat, this.GetClassName(this.CurrentTable)), string.Empty);
-                    }
-                      
+            this.RenderBodyWrite(renderBodyValue, string.Empty);
         }
 
-        public void ExecuteTemplate(CodeTemplate template,  string formatPath)
+        public void RenderBodyWrite(string renderBodyValue, string notRenderBodyValue)
         {
-                    this.CopyPropertiesTo(template);
-                    FullStack.Common.MasterTemplate masterTemplate = template as FullStack.Common.MasterTemplate;
-                    if (masterTemplate != null) 
-                    {
-                        masterTemplate.RenderBody = formatPath.Contains(".gen.");
-                    }
-                    
-                    if (formatPath.Contains("{0}")){
-                        template.RenderToFile(string.Format(formatPath, this.GetClassName(this.CurrentTable)), true);    
-                    } else 
-                    {
-                        template.RenderToFile(formatPath, true);
-                    }
+            if (this.RenderBody)
+            {
+                Response.Write(renderBodyValue);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(notRenderBodyValue))
+                {
+                    Response.Write(notRenderBodyValue);
+                }
+            }
+        }
+
+         public void RenderTemplateToFile(CodeSmith.Engine.CodeTemplate template, string destination)
+        {
+            this.CopyPropertiesTo(template);
+            template.RenderToFile(destination, true);            
         }
         
-        
-        public void OnProgress(object sender, ProgressEventArgs e)
+         public void BuildTemplate(CodeTemplate template, string projectLocation, string subFolderPath, string generatedFileName, string parentFileName)
         {
-            //if (e.Value > 0)
-            //{
-            //    this.Progress.Value = 75 + (_currentStep * 100) + (int)(((Double)e.Value / (Double)e.MaximumValue) * 100);
-            //}
+            if (!string.IsNullOrEmpty(parentFileName))
+            {
+                this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, subFolderPath, parentFileName));
+                this.AddFileToProject(projectLocation, subFolderPath, parentFileName, string.Empty);
+
+                this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, subFolderPath, generatedFileName));
+                this.AddFileToProject(projectLocation, subFolderPath, generatedFileName, parentFileName);
+            }
+            else
+            {
+                this.ExecuteTemplate(template, Path.Combine(this.OutputDirectory, this.SolutionName, this.CurrentProjectAlias, subFolderPath, generatedFileName));
+                this.AddFileToProject(projectLocation, subFolderPath, generatedFileName, string.Empty);
+            }
         }
+
         #endregion
     }
-
-    public class ProjectInfo 
+  
+    public class ProjectInfo
     {
-        public System.Guid ProjectGuid { get; set; }
-        public FullStack.Common.ProjectType ProjectType { get; set; }
-        public System.String Alias { get; set;}
-        
-        public ProjectInfo(System.String alias, System.Guid projectGuid, FullStack.Common.ProjectType projectType)
+        #region Constructors and Destructors
+
+        public ProjectInfo(String alias, Guid projectGuid, ProjectType projectType)
         {
             this.Alias = alias;
             this.ProjectGuid = projectGuid;
             this.ProjectType = projectType;
         }
-        
+
+        #endregion
+
+        #region Public Properties
+
+        public String Alias { get; set; }
+
+        public Guid ProjectGuid { get; set; }
+
+        public ProjectType ProjectType { get; set; }
+
+        #endregion
     }
-    
+
     public enum ProjectType
     {
         [Description("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")]

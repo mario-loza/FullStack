@@ -94,32 +94,4 @@ public override void Render(TextWriter writer)
     }
 }
 
-public void CopyNonTemplateFilesToFolder(string relativeSourceDirectory, string relativeTargetDirectory)
-{
-    foreach (var rootFile in Directory.EnumerateFiles(Path.Combine(this.CodeTemplateInfo.DirectoryName,relativeSourceDirectory)))
-	{
-        System.IO.FileInfo fi = new System.IO.FileInfo(rootFile);
-        if (!fi.Name.EndsWith(".cst")){
-            File.Copy(fi.FullName,GetProjectOutputDirectory(relativeTargetDirectory, fi.Name));           
-        }
-		
-	}
-}
-
-public string GetProjectOutputDirectory(string relativeTargetDirectory)
-{
-    return Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, relativeTargetDirectory);   
-}
-
-public string GetProjectOutputDirectory(string relativeTargetDirectory, string fileName)
-{
-    return Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias, relativeTargetDirectory, fileName);   
-}
-
-
-public void RenderTemplateToFile(CodeSmith.Engine.CodeTemplate template, string destination){
-    this.CopyPropertiesTo(template);
-    template.RenderToFile(destination, true);
-}
-
 </script>
