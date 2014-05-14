@@ -5,6 +5,7 @@
 <%@ Register Name="AssemblyInfoTemplate" Template="..\Resources\AssemblyInfoTemplate.cst" %>
 
 <%@ Register Name="AuthenticationTemplate" Template="Root\Authentication.cst" %>
+<%@ Register Name="AppConfigTemplate" Template="Root\app.config.cst" %>
 <%@ Register Name="ApiCredentialsTemplate" Template="Api\ApiCredentials.cst" %>
 <%@ Register Name="CoreApiTemplate" Template="Api\CoreApi.cst" %>
 <%@ Register Name="ClassApiTemplate" Template="Api\ClassApi.cst" %>
@@ -42,6 +43,7 @@ public override void Render(TextWriter writer)
         // Copy Packages
         this.CopyNonTemplateFilesToFolder("Root",string.Empty);
 
+        this.BuildTemplate(this.Create<AppConfigTemplate>(), projectLocation, string.Empty, "app.config", string.Empty);
         this.BuildTemplate(this.Create<AuthenticationTemplate>(), projectLocation, string.Empty, "Authentication.gen.cs", "Authentication.cs");
         this.BuildTemplate(this.Create<ApiCredentialsTemplate>(), projectLocation, "Api", "ApiCredentials.gen.cs", "ApiCredentials.cs");
         this.BuildTemplate(this.Create<CoreApiTemplate>(), projectLocation, "Api", this.ApiClassAlias + ".gen.cs", this.ApiClassAlias + ".cs");

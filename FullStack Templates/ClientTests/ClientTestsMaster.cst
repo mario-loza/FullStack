@@ -1,0 +1,62 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\Common\HeaderInclude.cst" -->
+<%@ Register Name="ProjectTemplate" Template="../Resources/EmptyTestProject.cst" %>
+<%@ Register Name="AssemblyInfoTemplate" Template="../Resources/AssemblyInfoTemplate.cst" %>
+<%@ Register Name="TestTemplate" Template="Root/TestTemplate.cst" %>
+<%@ Register Name="AppConfigTemplate" Template="Root/App.config.cst" %>
+<%@ Register Name="TestHelperTemplate" Template="Common/TestHelper.cst" %>
+<%@ Register Name="TestConstantsTemplate" Template="Common/TestConstants.cst" %>
+<%@ Register Name="SetupTeardownTemplate" Template="Common/SetupTeardown.cst" %>
+
+<script runat="template">
+private int _currentStep = 0;
+private int _currentTableCount = 0;
+private int _totalTableCount = 0;
+
+public override void Render(TextWriter writer)
+{
+    
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias));
+    this.ClearDirectory(GetProjectOutputDirectory("Common"));
+    this.ClearDirectory(GetProjectOutputDirectory("Properties"));
+    
+    string projectLocation = GetProjectOutputDirectory(string.Empty, this.CurrentProjectAlias + ".csproj");
+   
+    if (this.CreateProjectFiles)
+    {
+        this.RenderTemplateToFile(this.Create<ProjectTemplate>(), projectLocation);
+        
+        string clientAlias = this.StackProjects["Client"].Alias;
+        this.AddProjectReferenceToProject(projectLocation, string.Format("../{0}/{0}.csproj",clientAlias), this.StackProjects["Client"].ProjectGuid, clientAlias);
+       
+        //Copy the non-template file
+        this.CopyNonTemplateFilesToFolder("Root", string.Empty);
+
+        this.BuildTemplate(this.Create<AppConfigTemplate>(), projectLocation, string.Empty, "app.config", string.Empty);
+        this.BuildTemplate(this.Create<TestConstantsTemplate>(), projectLocation, "Common", "TestConstants.cs", string.Empty);
+        this.BuildTemplate(this.Create<SetupTeardownTemplate>(), projectLocation, "Common", "SetupTeardown.cs", string.Empty);
+        this.BuildTemplate(this.Create<TestHelperTemplate>(), projectLocation, "Common", "TestHelper.cs", string.Empty);
+        
+        this.CleanupProjectFile(projectLocation);
+    }
+
+    RenderTemplateToFile(this.Create<AssemblyInfoTemplate>(), Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Properties","AssemblyInfo.cs"));
+    
+    _totalTableCount = this.SourceDatabase.Tables.Count;
+    _currentTableCount = 0;
+    
+    foreach(TableSchema table in this.SourceDatabase.Tables)
+    {
+        this.CurrentTable = table;
+        _currentTableCount++;
+     
+        if (this.HasValidPrimaryKey(this.CurrentTable))
+        {
+            _currentStep = 1;
+             
+            this.BuildCurrentTableTemplate(this.Create<TestTemplate>(), projectLocation,"Tests",string.Format("{0}Tests.gen.cs", this.CurrentTable.Name),string.Format("{0}Tests.cs", this.CurrentTable.Name));            
+        }
+    }
+}
+
+</script>

@@ -1,0 +1,22 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
+{
+    using System;
+    using NUnit.Framework;
+
+    using <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Api;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Api.Models;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Common;
+
+      public static class TestConstants
+    {
+        public const string AdminUsername = "AdminUser";
+        public const string AdminPassword = "password";
+
+        public static readonly string Port = "9778";
+        public static readonly string TestUrl = string.Format("http://localhost:{0}/", Port);
+
+        public static bool UseIisExpress = false;
+    }
+}

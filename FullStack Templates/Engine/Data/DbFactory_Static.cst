@@ -60,7 +60,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
                 return cmd;
             }
 
-            throw new ArgumentOutOfRangeException("conn", conn, "Connection could not be cast to SqlConnection. For now, Vento only supports MS SQL");
+            throw new ArgumentOutOfRangeException("conn", conn, "Connection could not be cast to SqlConnection. For now, <%= this.SolutionName %> only supports MS SQL");
         }
 
         /// <summary>

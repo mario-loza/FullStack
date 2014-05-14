@@ -5,7 +5,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models
 {
     using System;
     
-    internal partial class <%= this.GetModelClassName(CurrentTable) %>
+    public partial class <%= this.GetModelClassName(CurrentTable) %>
     {
          <% if (this.RenderBody) 
         { // START RENDERBODY

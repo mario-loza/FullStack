@@ -187,23 +187,30 @@ namespace FullStack.Common
         /// </param>
         public void AddFileToProject(string projectPath, string projectSubDir, string file, string parent)
         {
+             string modifier = "Compile";
+            if (file.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase)){
+                modifier = "None";
+            }
+            
             XDocument proj = XDocument.Load(projectPath);
 
             XNamespace ns = "http://schemas.microsoft.com/developer/msbuild/2003";
-            XElement itemGroup = proj.Descendants(ns + "ItemGroup").FirstOrDefault(x => x.Descendants(ns + "Compile").Count() > 0);
+            XElement itemGroup = proj.Descendants(ns + "ItemGroup").FirstOrDefault(x => x.Descendants(ns + modifier).Count() > 0);
 
             if (itemGroup == null)
             {
                 throw new Exception(string.Format("Unable to find an ItemGroup to add the file {1} to the {0} project", projectPath, file));
             }
 
+           
             //If the file is already listed, don't bother adding it again
-            if (itemGroup.Descendants(ns + "Compile").Where(x => x.Attribute("Include").Value.ToString() == Path.Combine(projectSubDir, file)).Count() > 0)
+            if (itemGroup.Descendants(ns + modifier).Where(x => x.Attribute("Include").Value.ToString() == Path.Combine(projectSubDir, file)).Count() > 0)
             {
                 return;
             }
-
-            var item = new XElement(ns + "Compile", new XAttribute("Include", Path.Combine(projectSubDir, file)));
+            
+            
+            var item = new XElement(ns + modifier, new XAttribute("Include", Path.Combine(projectSubDir, file)));
 
             //This is used to group files together, in this case the file that is 
             //regenerated is grouped as a dependent of the user-editable file that
@@ -854,7 +861,7 @@ namespace FullStack.Common
         [Description("{4F174C21-8C12-11D0-8340-0000F80270F8}")]
         Database_OtherProjectTypes,
 
-        [Description("{3AC096D0-A1C2-E12C-1390-A8335801FDAB}")]
+        [Description("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")]
         Test,
 
         [Description("{20D4826A-C6FA-45DB-90F4-C717570B9F32}")]

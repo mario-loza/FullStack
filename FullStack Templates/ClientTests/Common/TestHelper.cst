@@ -1,0 +1,31 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
+{
+    using System;
+    using NUnit.Framework;
+
+    using <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Api;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Api.Models;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Common;
+
+    public static class TestHelper
+    {
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// Gets an instance of the API.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="<% = this.ApiClassAlias %>"/>.
+        /// </returns>
+        public static <% = this.ApiClassAlias %> GetApi()
+        {
+            var result = <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Authentication.Login(TestConstants.AdminUsername, TestConstants.AdminPassword, TestConstants.TestUrl);
+            result.Wait();
+            return result.Result;
+        }
+
+        #endregion
+    }
+}

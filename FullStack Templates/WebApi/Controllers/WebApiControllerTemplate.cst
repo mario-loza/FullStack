@@ -38,7 +38,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
                 }
             }
         
-           public IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> Get()
+            public IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> Get()
             {
                 return this.ManagerService.Read();                
             }

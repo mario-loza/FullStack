@@ -1,4 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   For more information on how to configure your ASP.NET application, please visit
   http://go.microsoft.com/fwlink/?LinkId=301879
@@ -11,7 +13,7 @@
     <add key="UnobtrusiveJavaScriptEnabled" value="true" />
   </appSettings>
   <connectionStrings>
-    <add name="Default" connectionString="Data Source=localhost\SQLEXPRESS;Initial Catalog=Vento;Integrated Security=True;Pooling=False;" providerName="System.Data.SqlClient" />
+    <add name="Default" connectionString="<% = SourceDatabase.ConnectionString %>" providerName="System.Data.SqlClient" />
   </connectionStrings>
   <system.web>
     <compilation debug="true" targetFramework="4.5" />

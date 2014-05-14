@@ -3,6 +3,7 @@
 <%@ Register Name="EngineMasterTemplate" Template="Engine\EngineMaster.cst" %>
 <%@ Register Name="WebApiMasterTemplate" Template="WebApi\WebApiMaster.cst" %>
 <%@ Register Name="ClientMasterTemplate" Template="Client\ClientMaster.cst" %>
+<%@ Register Name="ClientTestsMasterTemplate" Template="ClientTests\ClientTestsMaster.cst" %>
 <%@ Register Name="SolutionTemplate" Template="Resources\SolutionTemplate.cst" %>
 <%@ Register Name="RepositoryTemplate" Template="Resources\RepositoriesTemplate.cst" %>
 
@@ -14,6 +15,7 @@ public override void Render(TextWriter writer)
              {"Engine", new FullStack.Common.ProjectInfo("Engine", System.Guid.NewGuid(), FullStack.Common.ProjectType.WindowsCSharp)},
              {"Client", new FullStack.Common.ProjectInfo("Client", System.Guid.NewGuid(), FullStack.Common.ProjectType.WindowsCSharp)},
              {"WebApi", new FullStack.Common.ProjectInfo("WebApi", System.Guid.NewGuid(), FullStack.Common.ProjectType.ASPNET_ONE)},
+             {"ClientTests", new FullStack.Common.ProjectInfo("ClientTests", System.Guid.NewGuid(), FullStack.Common.ProjectType.Test)},
            };
     
     // Uncomment this code to always wipe the entire directory structure
@@ -75,5 +77,10 @@ public override void Render(TextWriter writer)
     this.CopyPropertiesTo(clientMaster);
     clientMaster.ProjectName = "Client";
     clientMaster.RenderToString();
+    
+    var clientTestsMaster = this.Create<ClientTestsMasterTemplate>();
+    this.CopyPropertiesTo(clientTestsMaster);
+    clientTestsMaster.ProjectName = "ClientTests";
+    clientTestsMaster.RenderToString();
 }
 </script>
