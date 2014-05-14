@@ -42,13 +42,13 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
         
             public ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>> Get()
             {
-                return this.ManagerService.Read();                
+                return new ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>(this.ManagerService.Read());                
             }
 
             // GET api/<%= this.GetClassName(CurrentTable) %>/5
             public ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> Get(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
             {
-                return this.ManagerService.Read(id);
+                return new ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>(this.ManagerService.Read(id));
             }
 
             // POST api/<%= this.GetClassName(CurrentTable) %>
