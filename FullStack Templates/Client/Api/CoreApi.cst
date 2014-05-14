@@ -33,7 +33,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
                 if (this.HasValidPrimaryKey(table))
                 {
             %>            
-            this.<% = this.GetClassName(table) %> = new <% = this.GetClassName(table) %>Api();
+            this.<% = table.Name %> = new <% = this.GetClassName(table) %>Api();
             <%
                 }
             } // END LOOPING THROUGH TABLES
@@ -50,7 +50,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
             if (this.HasValidPrimaryKey(table))
             {
         %>
-        public <% = this.GetClassName(table) %>Api <% = this.GetClassName(table) %> { get; private set; }
+        public <% = this.GetClassName(table) %>Api <% = table.Name %> { get; private set; }
         <%
             }
         } // END LOOPING THROUGH TABLES

@@ -3,9 +3,15 @@
 namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
 {
     using System;
+    using System.Net;
+    using System.Collections.Generic;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Threading.Tasks;
 
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    
     using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models;
     using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common;
        
@@ -24,11 +30,69 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
         /// <param name="sessionExpiration"></param>
         /// <param name="url"></param>
         internal <% = this.GetClassName(this.CurrentTable) %>Api()
-        {
-           
+        {           
         }
 
         #endregion
+        
+        public async Task<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>> GetAll<%= CurrentTable.Name %>()
+        {
+            IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> result = null;
+
+            using (var client = this.GetHttpClient())
+            {
+                HttpResponseMessage response = await client.GetAsync(string.Format("<% = CurrentTable.Name %>/"));
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResult = await response.Content.ReadAsStringAsync();
+                    ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>> token = JsonConvert.DeserializeObject<ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>>(jsonResult);
+
+                    if (!token.IsError)
+                    {
+                        result = token.Result;
+                    }
+                }
+            }
+
+            return result;                     
+        }
+
+        public async Task<<%= this.GetModelClassName(CurrentTable) %>> Get<%= this.GetClassName(CurrentTable) %>(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        {
+            <%= this.GetModelClassName(CurrentTable) %> result = null;
+
+            using (var client = this.GetHttpClient())
+            {
+                HttpResponseMessage response = await client.GetAsync(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "id") %>)));
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResult = await response.Content.ReadAsStringAsync();
+                    ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> token = JsonConvert.DeserializeObject<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>>(jsonResult);
+
+                    if (!token.IsError)
+                    {
+                        result = token.Result;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<<%= this.GetModelClassName(CurrentTable) %>> Create<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<<%= this.GetModelClassName(CurrentTable) %>> Update<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<<%= this.GetModelClassName(CurrentTable) %>> Delete<%= this.GetModelClassName(CurrentTable) %>ById(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        {
+            throw new NotImplementedException();
+        }
 
         <% } // END RENDERBODY %>        
     }

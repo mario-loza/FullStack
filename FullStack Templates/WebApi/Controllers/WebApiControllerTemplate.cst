@@ -11,6 +11,8 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
     
     using Newtonsoft.Json;
 
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models;
+    
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;     
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services;
     
@@ -38,13 +40,13 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
                 }
             }
         
-            public IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> Get()
+            public ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>> Get()
             {
                 return this.ManagerService.Read();                
             }
 
             // GET api/<%= this.GetClassName(CurrentTable) %>/5
-            public <%= this.GetModelClassName(CurrentTable) %> Get(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+            public ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> Get(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
             {
                 return this.ManagerService.Read(id);
             }

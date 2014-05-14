@@ -1,0 +1,35 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models
+{
+    using System;
+       
+    public partial class ApiResponse<T>
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+        
+        #region Constructors and Destructors
+
+        public ApiResponse(T result)
+        {
+            this.Result = result;
+            this.Resource = string.Empty;
+            this.IsError = false;
+        }
+
+        #endregion
+        
+        #region Public Properties
+
+        public bool IsError { get; set; }
+
+        public string Resource { get; set; }
+
+        public T Result { get; set; }
+
+        #endregion
+        <% } // END RENDERBODY %>        
+    }
+}

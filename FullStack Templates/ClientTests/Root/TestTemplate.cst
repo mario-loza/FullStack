@@ -4,7 +4,8 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Linq;
+    
     using NUnit.Framework;
 
     using <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Api.Models;
@@ -17,56 +18,58 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
         <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
-            [Test]
-            public void GetAll<%= this.GetModelClassName(CurrentTable) %>Test()
-            {
-                var api = TestHelper.GetApi();
+        [Test]
+        public void GetAll<%= this.GetClassName(CurrentTable) %>Test()
+        {
+            var api = TestHelper.GetApi();
+            var apiResult = api.<%= CurrentTable.Name %>.GetAll<%= CurrentTable.Name %>();
+            apiResult.Wait();
+            
+            IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> result = apiResult.Result;
+            Assert.IsTrue(result.Any());             
+        }
 
-                IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> result = null;
-                Assert.Inconclusive();             
-            }
+         [Test]
+        public void Get<%= this.GetModelClassName(CurrentTable) %>ByIdTest()
+        {
+             var api = TestHelper.GetApi();
 
-             [Test]
-            public void Get<%= this.GetModelClassName(CurrentTable) %>ByIdTest()
-            {
-                 var api = TestHelper.GetApi();
+            <%= this.GetModelClassName(CurrentTable) %> result = null;
+            <%= this.GetPrimaryKeyType(CurrentTable) %> id;
+            Assert.Inconclusive();
+        }
 
-                <%= this.GetModelClassName(CurrentTable) %> result = null;
-                <%= this.GetPrimaryKeyType(CurrentTable) %> id;
-                Assert.Inconclusive();
-            }
+        [Test]
+        public void Create<%= this.GetModelClassName(CurrentTable) %>Test()
+        {
+             var api = TestHelper.GetApi();
 
-            [Test]
-            public void Create<%= this.GetModelClassName(CurrentTable) %>Test()
-            {
-                 var api = TestHelper.GetApi();
+            <%= this.GetModelClassName(CurrentTable) %> actual;
+            <%= this.GetModelClassName(CurrentTable) %> expected;
+            Assert.Inconclusive();
+        }
 
-                <%= this.GetModelClassName(CurrentTable) %> actual;
-                <%= this.GetModelClassName(CurrentTable) %> expected;
-                Assert.Inconclusive();
-            }
+        [Test]
+        public void Update<%= this.GetModelClassName(CurrentTable) %>Test()
+        {
+             var api = TestHelper.GetApi();
 
-            [Test]
-            public void Update<%= this.GetModelClassName(CurrentTable) %>Test()
-            {
-                 var api = TestHelper.GetApi();
+            <%= this.GetPrimaryKeyType(CurrentTable) %> id;
+            <%= this.GetModelClassName(CurrentTable) %> actual;
+            <%= this.GetModelClassName(CurrentTable) %> expected;
+            Assert.Inconclusive();
+        }
 
-                <%= this.GetPrimaryKeyType(CurrentTable) %> id;
-                <%= this.GetModelClassName(CurrentTable) %> actual;
-                <%= this.GetModelClassName(CurrentTable) %> expected;
-                Assert.Inconclusive();
-            }
+         [Test]
+        public void Delete<%= this.GetModelClassName(CurrentTable) %>ByIdTest()
+        {
+            var api = TestHelper.GetApi();
 
-             [Test]
-            public void Delete<%= this.GetModelClassName(CurrentTable) %>ByIdTest()
-            {
-                var api = TestHelper.GetApi();
-
-                <%= this.GetPrimaryKeyType(CurrentTable) %> id;
-                <%= this.GetModelClassName(CurrentTable) %> actual;
-                <%= this.GetModelClassName(CurrentTable) %> expected;
-                Assert.Inconclusive();
-            }
+            <%= this.GetPrimaryKeyType(CurrentTable) %> id;
+            <%= this.GetModelClassName(CurrentTable) %> actual;
+            <%= this.GetModelClassName(CurrentTable) %> expected;
+            Assert.Inconclusive();
+        }
 
         <% } // END RENDERBODY %>        
     }   

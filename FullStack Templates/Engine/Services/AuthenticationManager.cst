@@ -1,0 +1,55 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Services
+{
+    using System;
+    using System.Collections.Generic;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Data;
+    
+    public <% this.RenderBodyWrite("abstract"); %> class <% this.RenderBodyWrite(string.Format("{0}Base : I{0}",this.GetManagerClassName("Authentication")), string.Format("{0} : {0}Base",this.GetManagerClassName("Authentication"))); %> 
+    {
+         <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+            public I<%= this.GetDataClassName("Authentication") %> DataService { get; set; }
+            
+            public <%= this.GetManagerClassName("Authentication") %>Base()
+            {
+                this.DataService = new <%= this.GetDataClassName("Authentication") %>();
+            }
+            
+            public <%= this.GetManagerClassName("Authentication") %>Base(I<%= this.GetDataClassName("Authentication") %> dataService)
+            {
+                if (dataService == null) 
+                {
+                    this.DataService = new <%= this.GetDataClassName("Authentication") %>();
+                }
+                else 
+                {
+                    this.DataService = dataService;
+                }
+            }
+            
+            public virtual bool IsValidCredentials(string username, string password) 
+            {
+                return this.DataService.IsValidCredentials(username, password);
+            }
+            
+        <% } // END RENDERBODY 
+            else
+            {
+        %>            
+            public <%= this.GetManagerClassName("Authentication") %>() : base()
+            {                
+            }
+            
+            public <%= this.GetManagerClassName("Authentication") %>(I<%= this.GetDataClassName("Authentication") %> dataService) : base(dataService)
+            {                
+            }
+        <% } // END RENDERBODY %>        
+    }
+}
+<script runat="template">
+
+</script>

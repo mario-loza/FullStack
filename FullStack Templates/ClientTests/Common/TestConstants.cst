@@ -14,9 +14,9 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
         public const string AdminUsername = "AdminUser";
         public const string AdminPassword = "password";
 
-        public static readonly string Port = "9778";
+        public static readonly string Port = "32557";
         public static readonly string TestUrl = string.Format("http://localhost:{0}/", Port);
 
-        public static bool UseIisExpress = false;
+        public static bool UseIisExpress = true;
     }
 }

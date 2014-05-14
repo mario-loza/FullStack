@@ -1,0 +1,26 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Data;    
+    using PetaPoco;
+    using <% = this.SolutionName %>.<% = this.StackProjects["Engine"].Alias %>.Models;
+
+    <%-- ONLY RENDER THE INTERFACE IF WE ARE RENDERING THE BODY--%>
+    internal <% this.RenderBodyWrite("abstract"); %> class <% this.RenderBodyWrite(string.Format("{0}Base : I{0}",this.GetDataClassName("Authentication")), string.Format("{0} : {0}Base",this.GetDataClassName("Authentication"))); %> 
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+        public virtual bool IsValidCredentials(string username, string password)
+		{
+		    return true;
+		}        
+		<% } // END RENDERBODY %>
+    }
+}
+<script runat="template">
+
+</script>

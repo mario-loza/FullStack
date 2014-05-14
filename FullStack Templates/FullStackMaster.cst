@@ -59,8 +59,6 @@ public override void Render(TextWriter writer)
                 fi.CopyTo(Path.Combine(nugetPath,fi.Name));
         	}
         }
-        
-        
     }
         
     var engineMaster = this.Create<EngineMasterTemplate>();

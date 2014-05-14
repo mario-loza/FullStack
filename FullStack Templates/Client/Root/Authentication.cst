@@ -29,7 +29,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
                     if (response.IsSuccessStatusCode)
                     {
                         string jsonResult = await response.Content.ReadAsStringAsync();
-                        ApiResponse<AuthorizationToken> apiResponse = JsonConvert.DeserializeObject<ApiResponse<AuthorizationToken>>(jsonResult);
+                        ApiResponse< <%= this.GetModelClassName("AuthorizationToken") %>> apiResponse = JsonConvert.DeserializeObject<ApiResponse< <%= this.GetModelClassName("AuthorizationToken") %>>>(jsonResult);
 
                         if (!apiResponse.IsError)
                         {

@@ -48,7 +48,7 @@ public override void Render(TextWriter writer)
         this.BuildTemplate(this.Create<ApiCredentialsTemplate>(), projectLocation, "Api", "ApiCredentials.gen.cs", "ApiCredentials.cs");
         this.BuildTemplate(this.Create<CoreApiTemplate>(), projectLocation, "Api", this.ApiClassAlias + ".gen.cs", this.ApiClassAlias + ".cs");
         this.BuildTemplate(this.Create<ApiResponseTemplate>(), projectLocation, @"Api\Models", "ApiResponse.gen.cs", "ApiResponse.cs");
-        this.BuildTemplate(this.Create<AuthorizationTokenTemplate>(), projectLocation, @"Api\Models", "AuthorizationToken.gen.cs", "AuthorizationToken.cs");
+        this.BuildTemplate(this.Create<AuthorizationTokenTemplate>(), projectLocation, @"Api\Models", "AuthorizationTokenModel.gen.cs", "AuthorizationTokenModel.cs");
         this.BuildTemplate(this.Create<ApiBaseTemplate>(), projectLocation, "Common", "ApiBase.gen.cs", "ApiBase.cs");
         this.BuildTemplate(this.Create<LogTemplate>(), projectLocation, "Common", "Log.gen.cs", "Log.cs");
     }

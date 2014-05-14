@@ -5,6 +5,7 @@
 <%@ Register Name="ControllerTemplate" Template="Controllers/WebApiControllerTemplate.cst" %>
 <%@ Register Name="HomeControllerTemplate" Template="Controllers/HomeController.cst" %>
 <%@ Register Name="ValuesControllerTemplate" Template="Controllers/ValuesController.cst" %>
+<%@ Register Name="AuthenticationControllerTemplate" Template="Controllers/AuthenticationController.cst" %>
 
 <%@ Register Name="ViewsWebConfigTemplate" Template="Views/Web.config.cst" %>
 
@@ -12,6 +13,8 @@
 
 <%@ Register Name="GlobalAsaxTemplate" Template="Root/Global.asax.cst" %>
 <%@ Register Name="GlobalAsaxCsTemplate" Template="Root/Global.asax.cs.cst" %>
+
+<%@ Register Name="ApiResponseTemplate" Template="Models/ApiResponse.cst" %>
 
 <%@ Register Name="AppStartBundleConfigTemplate" Template="App_Start/BundleConfig.cst" %>
 <%@ Register Name="AppStartFilterConfigTemplate" Template="App_Start/FilterConfig.cst" %>
@@ -73,6 +76,8 @@ public override void Render(TextWriter writer)
         this.RenderTemplateToFile(this.Create<AppStartRouteConfigTemplate>(), GetProjectOutputDirectory("App_Start","RouteConfig.cs"));
         this.RenderTemplateToFile(this.Create<AppStartWebApiConfigTemplate>(), GetProjectOutputDirectory("App_Start","WebApiConfig.cs"));
         
+        this.BuildCurrentTableTemplate(this.Create<AuthenticationControllerTemplate>(),projectLocation,"Controllers","AuthenticationController.gen.cs", "AuthenticationController.cs");
+        this.BuildCurrentTableTemplate(this.Create<ApiResponseTemplate>(),projectLocation,"Models","ApiResponse.gen.cs", "ApiResponse.cs");
         
         this.CleanupProjectFile(projectLocation);
   

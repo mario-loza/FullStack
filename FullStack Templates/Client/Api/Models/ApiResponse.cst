@@ -9,7 +9,8 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models
         <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
-         #region Public Properties
+        
+        #region Public Properties
 
         public bool IsError { get; set; }
 

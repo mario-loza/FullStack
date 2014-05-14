@@ -1,0 +1,87 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Web.Http;
+    
+    using Newtonsoft.Json;
+
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models;
+    
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;     
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services;
+    
+    public partial class <%= this.GetClassName("Authentication") %>Controller <% this.RenderBodyWrite(": ApiController",string.Empty); %>
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+            public I<%= this.GetManagerClassName("Authentication") %> ManagerService { get; set; }
+            
+            public <%= this.GetClassName("Authentication") %>Controller()
+            {
+                this.ManagerService = new <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services.<%= this.GetManagerClassName("Authentication") %>();
+            }
+            
+            public <%= this.GetClassName("Authentication") %>Controller(I<%= this.GetManagerClassName("Authentication") %> managerService)
+            {
+                if (managerService == null) 
+                {
+                    this.ManagerService = new <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services.<%= this.GetManagerClassName("Authentication") %>();
+                }
+                else 
+                {
+                    this.ManagerService = managerService;
+                }
+            }
+            
+            // POST api/authentication
+            public IHttpActionResult Post([FromBody]string value)
+            {
+                <%= this.GetModelClassName("AuthorizationToken") %> token = null;
+                if (this.ManagerService.IsValidCredentials(string.Empty, string.Empty))
+                {                
+                    token = new <%= this.GetModelClassName("AuthorizationToken") %>();
+                    token.SessionKey = Guid.NewGuid().ToString();
+                    token.Expiration = DateTime.UtcNow.AddMinutes(20);                
+                }
+                return this.Json(new ApiResponse<<%= this.GetModelClassName("AuthorizationToken") %>>(token));
+            }
+
+            // PUT api/authentication/abc4s3
+            /// <summary>
+            /// Updates the session
+            /// </summary>
+            /// <param name="sessionKey"></param>
+            /// <param name="value"></param>
+            public void Put(string sessionKey, [FromBody]string value)
+            {
+            }
+
+            // DELETE api/authentication/5
+            public void Delete(string sessionKey)
+            {
+            }
+
+            public IHttpActionResult Get()
+            {
+                <%= this.GetModelClassName("AuthorizationToken") %> token = null;
+                if (this.ManagerService.IsValidCredentials(string.Empty, string.Empty))
+                {                
+                    token = new <%= this.GetModelClassName("AuthorizationToken") %>();
+                    token.SessionKey = Guid.NewGuid().ToString();
+                    token.Expiration = DateTime.UtcNow.AddMinutes(20);                
+                }
+                return this.Json(new ApiResponse<<%= this.GetModelClassName("AuthorizationToken") %>>(token));
+            }
+       <% } // END RENDERBODY %>       
+    }
+}
+<script runat="template">
+
+</script>

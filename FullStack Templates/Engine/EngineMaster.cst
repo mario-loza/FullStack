@@ -5,8 +5,16 @@
 <%@ Register Name="EngineDataClassTemplate" Template="Data\EngineDataClass.cst" %>
 <%@ Register Name="EngineDataInterfaceTemplate" Template="Data\EngineDataInterface.cst" %>
 <%@ Register Name="EngineModelsTemplate" Template="Models\EngineModel.cst" %>
+<%@ Register Name="AuthorizationTokenTemplate" Template="Models\AuthorizationToken.cst" %>
 <%@ Register Name="EngineManagerTemplate" Template="Services\EngineManager.cst" %>
 <%@ Register Name="EngineManagerInterfaceTemplate" Template="Services\EngineManagerInterface.cst" %>
+
+<%@ Register Name="AuthenticationDataClassTemplate" Template="Data\AuthenticationDataClass.cst" %>
+<%@ Register Name="AuthenticationDataInterfaceTemplate" Template="Data\AuthenticationDataInterface.cst" %>
+<%@ Register Name="AuthenticationManagerTemplate" Template="Services\AuthenticationManager.cst" %>
+<%@ Register Name="AuthenticationManagerInterfaceTemplate" Template="Services\AuthenticationManagerInterface.cst" %>
+
+
 <%@ Register Name="ProjectTemplate" Template="../Resources/EmptyCsLibraryProject.cst" %>
 <%@ Register Name="AssemblyInfoTemplate" Template="../Resources/AssemblyInfoTemplate.cst" %>
 <script runat="template">
@@ -44,12 +52,17 @@ public override void Render(TextWriter writer)
     // ADD STATIC FILES
     
     #region STATIC DATA FILES
-     File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Models","PetaPoco.txt"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models","PetaPoco.cs"));
-     this.AddFileToProject(projectLocation,"Models",string.Format("PetaPoco.cs", this.GetClassName(this.CurrentTable)), string.Empty);
+    File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Models","PetaPoco.txt"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models","PetaPoco.cs"));
+    this.AddFileToProject(projectLocation,"Models",string.Format("PetaPoco.cs", this.GetClassName(this.CurrentTable)), string.Empty);
+
+    this.BuildCurrentTableTemplate(this.Create<DbFactory>(),projectLocation,"Data","DbFactory.cs", string.Empty);
+    this.BuildCurrentTableTemplate(this.Create<DbProviderTypes>(),projectLocation,"Data","DbProviderTypes.cs", string.Empty);
     
-     this.BuildCurrentTableTemplate(this.Create<DbFactory>(),projectLocation,"Data","DbFactory.cs", string.Empty);
-     this.BuildCurrentTableTemplate(this.Create<DbProviderTypes>(),projectLocation,"Data","DbProviderTypes.cs", string.Empty);
-    
+    this.BuildCurrentTableTemplate(this.Create<AuthorizationTokenTemplate>(),projectLocation,"Models","AuthorizationTokenModel.gen.cs","AuthorizationTokenModel.cs");
+    this.BuildCurrentTableTemplate(this.Create<AuthenticationDataClassTemplate>(),projectLocation,"Data","AuthenticationDataBase.gen.cs","AuthenticationData.cs");
+    this.BuildCurrentTableTemplate(this.Create<AuthenticationDataInterfaceTemplate>(),projectLocation,"Data","IAuthenticationData.gen.cs","IAuthenticationData.cs");
+    this.BuildCurrentTableTemplate(this.Create<AuthenticationManagerTemplate>(),projectLocation,"Services","AuthenticationManagerBase.gen.cs","AuthenticationManager.cs");
+    this.BuildCurrentTableTemplate(this.Create<AuthenticationManagerInterfaceTemplate>(),projectLocation,"Services","IAuthenticationManager.gen.cs","IAuthenticationManager.cs");            
     #endregion
     
     foreach(TableSchema table in this.SourceDatabase.Tables)

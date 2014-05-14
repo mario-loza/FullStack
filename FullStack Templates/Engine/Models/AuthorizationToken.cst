@@ -1,0 +1,24 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models
+{
+    using System;
+    using PetaPoco;
+
+    public partial class <%= this.GetModelClassName("AuthorizationToken") %>
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+        #region Public Properties
+        
+        public string SessionKey { get; set; }
+        public DateTime Expiration { get; set; }
+		
+        #endregion
+        <% } // END RENDERBODY %>
+    }
+}
+<script runat="template">
+
+</script>

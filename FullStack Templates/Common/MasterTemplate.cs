@@ -431,6 +431,12 @@ namespace FullStack.Common
                 }
             }
         }
+        
+         public string GetClassName(string className)
+        {
+            return className;
+        }
+
 
         public string GetColumnSize(ColumnSchema column)
         {
@@ -460,10 +466,20 @@ namespace FullStack.Common
         {
             return string.Format("{0}Data", this.GetClassName(table));
         }
+        
+         public string GetDataClassName(string className)
+        {
+            return string.Format("{0}Data", className);
+        }
 
         public string GetManagerClassName(TableSchema table)
         {
             return string.Format("{0}Manager", this.GetClassName(table));
+        }
+
+          public string GetManagerClassName(string className)
+        {
+            return string.Format("{0}Manager", className);
         }
 
         public string GetMemberVariableDeclarationStatement(ColumnSchema column)
@@ -515,6 +531,11 @@ namespace FullStack.Common
             string memberVariableName = "_" + this.GetCamelCaseName(propertyName);
 
             return memberVariableName;
+        }
+
+         public string GetModelClassName(string className)
+        {
+            return string.Format("{0}Model", className);
         }
 
         public string GetModelClassName(TableSchema table)
@@ -575,6 +596,19 @@ namespace FullStack.Common
             else
             {
                 throw new ApplicationException(string.Format("Error parsing the table [{0}]. This template will only work on tables with a primary key.", table.Name));
+            }
+        }
+        
+        public string GetPrimaryKeyToString(TableSchema table, string variableName)
+        {
+            string keyType = GetPrimaryKeyType(table);
+            
+            if (keyType.Equals("string", StringComparison.InvariantCultureIgnoreCase)){
+                return variableName;    
+            } 
+            else 
+            {
+                return string.Format("{0}.ToString()", variableName);
             }
         }
 

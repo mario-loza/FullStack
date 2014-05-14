@@ -4,7 +4,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models
 {
     using System;
        
-    internal partial class AuthorizationToken
+    internal partial class  <%= this.GetModelClassName("AuthorizationToken") %>
     {
         <% if (this.RenderBody) 
         { // START RENDERBODY
