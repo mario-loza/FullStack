@@ -45,6 +45,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="" />
   </ItemGroup>
   <ItemGroup>

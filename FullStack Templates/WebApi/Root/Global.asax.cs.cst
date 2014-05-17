@@ -20,6 +20,8 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            
+            <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Setup.DatabaseManager.InitializeDatabase();
         }
     }
 }

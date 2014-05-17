@@ -220,6 +220,10 @@ namespace FullStack.Common
              string modifier = "Compile";
             if (file.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".sql", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".xml", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase)){
                 modifier = "None";
+                if (projectSubDir.StartsWith(@"Resources", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    modifier = "EmbeddedResource";
+                }
             }
             
             XDocument proj = XDocument.Load(projectPath);
@@ -315,27 +319,36 @@ namespace FullStack.Common
         public void CleanupProjectFile(string projectPath)
         {
             XDocument proj = XDocument.Load(projectPath);
-
-            XNamespace ns = "http://schemas.microsoft.com/developer/msbuild/2003";
-            XElement itemGroup = proj.Descendants(ns + "ItemGroup").FirstOrDefault(x => x.Descendants(ns + "ProjectReference").Count() > 0);
-
-            if (itemGroup == null)
-            {
-                return;
-            }
-
+            bool projectUpdated = false;
             //If the file is already listed, don't bother adding it again
-            IEnumerable<XElement> foundElements = itemGroup.Descendants(ns + "ProjectReference").Where(x => x.Attribute("Include").Value.ToString() == string.Empty);
-            IList<XElement> xElements = foundElements as IList<XElement> ?? foundElements.ToList();
-            if (xElements.Any())
-            {
-                foreach (XElement foundElement in xElements)
-                {
-                    foundElement.Remove();
-                }
-            }
+            string[] modifiers = new []{"ProjectReference", "EmbeddedResource"};
+            
+            foreach (var modifier in modifiers)
+        	{
+                  XNamespace ns = "http://schemas.microsoft.com/developer/msbuild/2003";
+                  XElement itemGroup = proj.Descendants(ns + "ItemGroup").FirstOrDefault(x => x.Descendants(ns + modifier).Count() > 0);
 
-            proj.Save(projectPath);
+                if (itemGroup != null)
+                {
+                    IEnumerable<XElement> foundElements = itemGroup.Descendants(ns + modifier).Where(x => x.Attribute("Include").Value.ToString() == string.Empty);
+                    IList<XElement> xElements = foundElements as IList<XElement> ?? foundElements.ToList();
+                    if (xElements.Any())
+                    {
+                        foreach (XElement foundElement in xElements)
+                        {
+                            foundElement.Remove();
+                            projectUpdated = true;
+                        }
+                    }
+                }
+        		
+        	}
+            
+            if (projectUpdated)
+            {
+                proj.Save(projectPath);    
+            }
+            
         }
 
         /// <summary>

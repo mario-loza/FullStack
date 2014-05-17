@@ -42,6 +42,9 @@
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
+   <ItemGroup>
+    <EmbeddedResource Include="" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="" />
   </ItemGroup>

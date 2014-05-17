@@ -41,8 +41,7 @@ public override void Render(TextWriter writer)
         this.AddAssemblyToProject(projectLocation, "System.Net.Http.Formatting");
         this.AddAssemblyToProject(projectLocation, "Newtonsoft.Json");
         
-        this.CleanupProjectFile(projectLocation);
-
+       
         // Copy Packages
         this.CopyNonTemplateFilesToFolder("Root",string.Empty);
 
@@ -76,6 +75,9 @@ public override void Render(TextWriter writer)
             this.BuildCurrentTableTemplate(this.Create<ClientModelTemplate>(),projectLocation,@"Api\Models","{0}Model.gen.cs","{0}Model.cs");
         }
     }
+    
+     this.CleanupProjectFile(projectLocation);
+
 }
 
 </script>

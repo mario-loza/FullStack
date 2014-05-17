@@ -57,7 +57,6 @@ public override void Render(TextWriter writer)
         ProjectTemplate projectTemplate = this.Create<ProjectTemplate>();
         this.CopyPropertiesTo(projectTemplate);
         projectTemplate.RenderToFile(projectLocation, true);
-        this.CleanupProjectFile(projectLocation);
         
         // Copy Packages
         this.CopyNonTemplateFilesToFolder("Root",string.Empty);       
@@ -135,5 +134,8 @@ public override void Render(TextWriter writer)
             this.BuildCurrentTableTemplate(this.Create<Services_EngineManagerInterface>(),projectLocation,"Services","I{0}Manager.gen.cs","I{0}Manager.cs");            
          }
     }
+    
+    this.CleanupProjectFile(projectLocation);
+      
 }
 </script>

@@ -46,7 +46,7 @@ public override void Render(TextWriter writer)
         this.BuildTemplate(this.Create<SetupTeardownTemplate>(), projectLocation, "Common", "SetupTeardown.cs", string.Empty);
         this.BuildTemplate(this.Create<TestHelperTemplate>(), projectLocation, "Common", "TestHelper.cs", string.Empty);
         
-        this.CleanupProjectFile(projectLocation);
+        
     }
 
     RenderTemplateToFile(this.Create<AssemblyInfoTemplate>(), Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Properties","AssemblyInfo.cs"));
@@ -66,6 +66,8 @@ public override void Render(TextWriter writer)
             this.BuildCurrentTableTemplate(this.Create<TestTemplate>(), projectLocation,"Tests",string.Format("{0}Tests.gen.cs", this.CurrentTable.Name),string.Format("{0}Tests.cs", this.CurrentTable.Name));            
         }
     }
+    
+    this.CleanupProjectFile(projectLocation);
 }
 
 </script>

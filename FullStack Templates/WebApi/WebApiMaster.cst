@@ -83,7 +83,7 @@ public override void Render(TextWriter writer)
         this.BuildCurrentTableTemplate(this.Create<AuthenticationControllerTemplate>(),projectLocation,"Controllers","AuthenticationController.gen.cs", "AuthenticationController.cs");
         this.BuildCurrentTableTemplate(this.Create<ApiResponseTemplate>(),projectLocation,"Models","ApiResponse.gen.cs", "ApiResponse.cs");
         
-        this.CleanupProjectFile(projectLocation);
+      
   
         
     }
@@ -105,6 +105,8 @@ public override void Render(TextWriter writer)
             this.BuildCurrentTableTemplate(this.Create<ControllerTemplate>(), projectLocation,"Controllers",string.Format("{0}Controller.gen.cs", this.CurrentTable.Name),string.Format("{0}Controller.cs", this.CurrentTable.Name));            
         }
     }
+    
+      this.CleanupProjectFile(projectLocation);
 }
 
 </script>
