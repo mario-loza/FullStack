@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<steps isRequired="true">
+  <step role="db" value="Tables.sql" />
+  <step role="db" value="Indexes.sql" />
+  <step role="db" value="StoredProcs.sql" />
+  <step role="db" value="SeedData.sql" />
+</steps>

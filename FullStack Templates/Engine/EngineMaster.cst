@@ -1,18 +1,33 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
 <!-- #include file="..\Common\HeaderInclude.cst" -->
-<%@ Register Name="DbFactory" Template="Data\DbFactory_Static.cst" %>
-<%@ Register Name="DbProviderTypes" Template="Data\DbProviderTypes_Static.cst" %>
-<%@ Register Name="EngineDataClassTemplate" Template="Data\EngineDataClass.cst" %>
-<%@ Register Name="EngineDataInterfaceTemplate" Template="Data\EngineDataInterface.cst" %>
-<%@ Register Name="EngineModelsTemplate" Template="Models\EngineModel.cst" %>
-<%@ Register Name="AuthorizationTokenTemplate" Template="Models\AuthorizationToken.cst" %>
-<%@ Register Name="EngineManagerTemplate" Template="Services\EngineManager.cst" %>
-<%@ Register Name="EngineManagerInterfaceTemplate" Template="Services\EngineManagerInterface.cst" %>
+<%@ Register Name="Common_Log" Template="Common\Log.cst" %>
+<%@ Register Name="Common_ClaimTypes" Template="Common\ClaimTypes.cst" %>
+<%@ Register Name="Common_ClaimsIdentity" Template="Common\ClaimsIdentity.cst" %>
 
-<%@ Register Name="AuthenticationDataClassTemplate" Template="Data\AuthenticationDataClass.cst" %>
-<%@ Register Name="AuthenticationDataInterfaceTemplate" Template="Data\AuthenticationDataInterface.cst" %>
-<%@ Register Name="AuthenticationManagerTemplate" Template="Services\AuthenticationManager.cst" %>
-<%@ Register Name="AuthenticationManagerInterfaceTemplate" Template="Services\AuthenticationManagerInterface.cst" %>
+<%@ Register Name="Data_AuthenticationDataClass" Template="Data\AuthenticationDataClass.cst" %>
+<%@ Register Name="Data_AuthenticationDataInterface" Template="Data\AuthenticationDataInterface.cst" %>
+<%@ Register Name="Data_DbFactory" Template="Data\DbFactory_Static.cst" %>
+<%@ Register Name="Data_DbProviderTypes" Template="Data\DbProviderTypes_Static.cst" %>
+<%@ Register Name="Data_EngineDataClass" Template="Data\EngineDataClass.cst" %>
+<%@ Register Name="Data_EngineDataInterface" Template="Data\EngineDataInterface.cst" %>
+<%@ Register Name="Data_DatabaseExtensions" Template="Data\DatabaseExtensions.cst" %>
+
+<%@ Register Name="Models_AuthorizationToken" Template="Models\AuthorizationToken.cst" %>
+<%@ Register Name="Models_EngineModels" Template="Models\EngineModel.cst" %>
+
+<%@ Register Name="Resources_ResourceManager" Template="Resources\ResourceManager.cst" %>
+
+<%@ Register Name="Root_SolutionConfig" Template="Root\SolutionConfig.cst" %>
+
+<%@ Register Name="Services_AuthenticationManager" Template="Services\AuthenticationManager.cst" %>
+<%@ Register Name="Services_AuthenticationManagerInterface" Template="Services\AuthenticationManagerInterface.cst" %>
+<%@ Register Name="Services_EngineManager" Template="Services\EngineManager.cst" %>
+<%@ Register Name="Services_EngineManagerInterface" Template="Services\EngineManagerInterface.cst" %>
+
+<%@ Register Name="Setup_DatabaseManager" Template="Setup\DatabaseManager.cst" %>
+<%@ Register Name="Setup_UpgradeStep" Template="Setup\UpgradeStep.cst" %>
+<%@ Register Name="Setup_UpgradeStepManager" Template="Setup\UpgradeStepManager.cst" %>
+<%@ Register Name="Setup_UpgradeStepVersion" Template="Setup\UpgradeStepVersion.cst" %>
 
 
 <%@ Register Name="ProjectTemplate" Template="../Resources/EmptyCsLibraryProject.cst" %>
@@ -25,9 +40,16 @@ private int _totalTableCount = 0;
 public override void Render(TextWriter writer)
 {
     this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias));
-    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Common"));
     this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Data"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Databases"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Exceptions"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Resources"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Resources","Database","v1"));
     this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Services"));
+    this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Setup"));
+    
         
     string projectLocation = Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,this.CurrentProjectAlias + ".csproj");
     if (this.CreateProjectFiles)
@@ -39,6 +61,11 @@ public override void Render(TextWriter writer)
         
         // Copy Packages
         this.CopyNonTemplateFilesToFolder("Root",string.Empty);       
+        
+        this.AddAssemblyToProject(projectLocation,"Exceptionless",@"..\packages\Exceptionless.1.4.1954\lib\net45\Exceptionless.dll");
+        this.AddAssemblyToProject(projectLocation,"Exceptionless.Models",@"..\packages\Exceptionless.1.4.1954\lib\net45\Exceptionless.Models.dll");
+        this.AddAssemblyToProject(projectLocation,"log4net",@"..\packages\log4net.2.0.3\lib\net40-full\log4net.dll");
+        
     }
     
     AssemblyInfoTemplate assemblyTemplate = this.Create<AssemblyInfoTemplate>();
@@ -53,17 +80,44 @@ public override void Render(TextWriter writer)
     
     #region STATIC DATA FILES
     File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Models","PetaPoco.txt"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Models","PetaPoco.cs"));
-    this.AddFileToProject(projectLocation,"Models",string.Format("PetaPoco.cs", this.GetClassName(this.CurrentTable)), string.Empty);
+    this.AddFileToProject(projectLocation,"Models","PetaPoco.cs", string.Empty);
 
-    this.BuildCurrentTableTemplate(this.Create<DbFactory>(),projectLocation,"Data","DbFactory.cs", string.Empty);
-    this.BuildCurrentTableTemplate(this.Create<DbProviderTypes>(),projectLocation,"Data","DbProviderTypes.cs", string.Empty);
+    File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Resources","log4net.config"),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Resources","log4net.config"));
+    this.AddFileToProject(projectLocation,"Resources","log4net.config", string.Empty);
     
-    this.BuildCurrentTableTemplate(this.Create<AuthorizationTokenTemplate>(),projectLocation,"Models","AuthorizationTokenModel.gen.cs","AuthorizationTokenModel.cs");
-    this.BuildCurrentTableTemplate(this.Create<AuthenticationDataClassTemplate>(),projectLocation,"Data","AuthenticationDataBase.gen.cs","AuthenticationData.cs");
-    this.BuildCurrentTableTemplate(this.Create<AuthenticationDataInterfaceTemplate>(),projectLocation,"Data","IAuthenticationData.gen.cs","IAuthenticationData.cs");
-    this.BuildCurrentTableTemplate(this.Create<AuthenticationManagerTemplate>(),projectLocation,"Services","AuthenticationManagerBase.gen.cs","AuthenticationManager.cs");
-    this.BuildCurrentTableTemplate(this.Create<AuthenticationManagerInterfaceTemplate>(),projectLocation,"Services","IAuthenticationManager.gen.cs","IAuthenticationManager.cs");            
+    
+    string[] dbFiles = new []{"Indexes.sql","SeedData.sql", "Steps.xml", "StoredProcs.sql", "Tables.sql"};
+    foreach (var dbFile in dbFiles)
+  	{
+  	    File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Resources","Database","v1",dbFile),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Resources","Database","v1",dbFile));
+        this.AddFileToProject(projectLocation,@"Resources\Database\v1",dbFile, string.Empty);
+  	}
+    
+    this.BuildCurrentTableTemplate(this.Create<Common_ClaimsIdentity>(),projectLocation,"Common",this.SolutionName + "ClaimsIdentity.cs", string.Empty);
+    this.BuildCurrentTableTemplate(this.Create<Common_ClaimTypes>(),projectLocation,"Common",this.SolutionName + "ClaimTypes.cs", string.Empty);
+    this.BuildCurrentTableTemplate(this.Create<Common_Log>(),projectLocation,"Common","Log.cs", string.Empty);
+    
+    this.BuildCurrentTableTemplate(this.Create<Data_AuthenticationDataClass>(),projectLocation,"Data","AuthenticationDataBase.gen.cs","AuthenticationData.cs");
+    this.BuildCurrentTableTemplate(this.Create<Data_AuthenticationDataInterface>(),projectLocation,"Data","IAuthenticationData.gen.cs","IAuthenticationData.cs");
+    this.BuildCurrentTableTemplate(this.Create<Data_DbFactory>(),projectLocation,"Data","DbFactory.cs", string.Empty);
+    this.BuildCurrentTableTemplate(this.Create<Data_DbProviderTypes>(),projectLocation,"Data","DbProviderTypes.cs", string.Empty);
+    this.BuildCurrentTableTemplate(this.Create<Data_DatabaseExtensions>(),projectLocation,"Data","DatabaseExtensions.cs", string.Empty);
+       
+    this.BuildCurrentTableTemplate(this.Create<Models_AuthorizationToken>(),projectLocation,"Models","AuthorizationTokenModel.gen.cs","AuthorizationTokenModel.cs");
+    
+    this.BuildCurrentTableTemplate(this.Create<Resources_ResourceManager>(),projectLocation,"Resources","ResourceManager.cs",string.Empty);
+    
+    this.BuildCurrentTableTemplate(this.Create<Root_SolutionConfig>(),projectLocation,"",this.SolutionName + "Config.cs",string.Empty);
+    
+    this.BuildCurrentTableTemplate(this.Create<Setup_DatabaseManager>(),projectLocation,"Setup","DatabaseManager.cs",string.Empty);
+    this.BuildCurrentTableTemplate(this.Create<Setup_UpgradeStep>(),projectLocation,"Setup","UpgradeStep.cs",string.Empty);
+    this.BuildCurrentTableTemplate(this.Create<Setup_UpgradeStepManager>(),projectLocation,"Setup","UpgradeStepManager.cs",string.Empty);
+    this.BuildCurrentTableTemplate(this.Create<Setup_UpgradeStepVersion>(),projectLocation,"Setup","UpgradeStepVersion.cs",string.Empty);
+    
+    this.BuildCurrentTableTemplate(this.Create<Services_AuthenticationManager>(),projectLocation,"Services","AuthenticationManagerBase.gen.cs","AuthenticationManager.cs");
+    this.BuildCurrentTableTemplate(this.Create<Services_AuthenticationManagerInterface>(),projectLocation,"Services","IAuthenticationManager.gen.cs","IAuthenticationManager.cs");            
     #endregion
+    
     
     foreach(TableSchema table in this.SourceDatabase.Tables)
     {
@@ -74,11 +128,11 @@ public override void Render(TextWriter writer)
         {
             _currentStep = 1;
              
-            this.BuildCurrentTableTemplate(this.Create<EngineModelsTemplate>(),projectLocation,"Models","{0}Model.gen.cs","{0}Model.cs");
-            this.BuildCurrentTableTemplate(this.Create<EngineDataClassTemplate>(),projectLocation,"Data","{0}DataBase.gen.cs","{0}Data.cs");
-            this.BuildCurrentTableTemplate(this.Create<EngineDataInterfaceTemplate>(),projectLocation,"Data","I{0}Data.gen.cs","I{0}Data.cs");
-            this.BuildCurrentTableTemplate(this.Create<EngineManagerTemplate>(),projectLocation,"Services","{0}ManagerBase.gen.cs","{0}Manager.cs");
-            this.BuildCurrentTableTemplate(this.Create<EngineManagerInterfaceTemplate>(),projectLocation,"Services","I{0}Manager.gen.cs","I{0}Manager.cs");            
+            this.BuildCurrentTableTemplate(this.Create<Models_EngineModels>(),projectLocation,"Models","{0}Model.gen.cs","{0}Model.cs");
+            this.BuildCurrentTableTemplate(this.Create<Data_EngineDataClass>(),projectLocation,"Data","{0}DataBase.gen.cs","{0}Data.cs");
+            this.BuildCurrentTableTemplate(this.Create<Data_EngineDataInterface>(),projectLocation,"Data","I{0}Data.gen.cs","I{0}Data.cs");
+            this.BuildCurrentTableTemplate(this.Create<Services_EngineManager>(),projectLocation,"Services","{0}ManagerBase.gen.cs","{0}Manager.cs");
+            this.BuildCurrentTableTemplate(this.Create<Services_EngineManagerInterface>(),projectLocation,"Services","I{0}Manager.gen.cs","I{0}Manager.cs");            
          }
     }
 }

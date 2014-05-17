@@ -34,6 +34,9 @@ public override void Render(TextWriter writer)
         this.CopyPropertiesTo(projectTemplate);
         projectTemplate.RenderToFile(projectLocation, true);
         
+        this.AddAssemblyToProject(projectLocation,"Exceptionless",@"..\packages\Exceptionless.1.4.1954\lib\net45\Exceptionless.dll");
+        this.AddAssemblyToProject(projectLocation,"Exceptionless.Models",@"..\packages\Exceptionless.1.4.1954\lib\net45\Exceptionless.Models.dll");
+        this.AddAssemblyToProject(projectLocation,"log4net",@"..\packages\log4net.2.0.3\lib\net40-full\log4net.dll");
         this.AddAssemblyToProject(projectLocation, "System.Net.Http");
         this.AddAssemblyToProject(projectLocation, "System.Net.Http.Formatting");
         this.AddAssemblyToProject(projectLocation, "Newtonsoft.Json");

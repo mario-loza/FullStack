@@ -1,0 +1,27 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Setup
+{
+    public class UpgradeStep
+    {
+        /// <summary>
+        ///     The role of the step: DB File, Class
+        /// </summary>
+        public string Role { get; set; }
+
+        /// <summary>
+        ///     The raw value of the step
+        /// </summary>
+        public string Value { get; set; }
+
+        /// <summary>
+        ///     The full calculated resource name
+        /// </summary>
+        public string ResourceName { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("Role: [{0}], Value: [{1}], ResourceName: [{2}]", Role, Value, ResourceName);
+        }
+    }
+}

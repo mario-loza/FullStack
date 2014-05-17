@@ -25,7 +25,7 @@ public override void Render(TextWriter writer)
         Directory.CreateDirectory(Path.Combine(this.OutputDirectory, this.SolutionName));    
     }    
     
-    // If there is no solution file then we must run all code associated with creating project files
+    // If there is no solution file then we must run all code associated withc reating project files
     if (!File.Exists(Path.Combine(string.Format(Path.Combine(this.OutputDirectory, this.SolutionName, "{0}.sln"), this.SolutionName))))
     {        
         this.CreateProjectFiles = true;

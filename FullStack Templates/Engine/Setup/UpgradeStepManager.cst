@@ -1,0 +1,68 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Setup
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Linq;
+
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Resources;
+
+    /// <summary>
+    ///     Manages the upgrade steps
+    /// </summary>
+    public static class UpgradeStepManager
+    {
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// Gets the steps for an upgrade version
+        /// </summary>
+        /// <param name="targetVersion">
+        /// The version you want to get the steps for
+        /// </param>
+        /// <returns>
+        /// Returns a list of steps
+        /// </returns>
+        public static UpgradeStepVersion GetUpgradeStepVersion(int targetVersion)
+        {
+            UpgradeStepVersion versionStep = null;
+
+            // Pull the XML file so we can grab the actual steps into an object
+            string stepXml = ResourceManager.GetResourceTextFile(string.Format("<%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Resources.Database.v{0}.Steps.xml", targetVersion));
+            if (!string.IsNullOrWhiteSpace(stepXml))
+            {
+                // Parse the XML
+                XDocument doc = XDocument.Parse(stepXml);
+                if (doc.Root != null)
+                {
+                    versionStep = new UpgradeStepVersion();
+                    versionStep.Version = targetVersion;
+                    versionStep.IsRequired = bool.Parse(doc.Root.Attribute("isRequired").Value);
+
+                    IEnumerable<XElement> elements = doc.Root.Elements();
+                    foreach (XElement element in elements)
+                    {
+                        var step = new UpgradeStep();
+                        step.Role = element.Attribute("role").Value;
+                        step.Value = element.Attribute("value").Value;
+                        step.ResourceName = string.Format("<%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Resources.Database.v{0}.{1}", targetVersion, step.Value);
+                        versionStep.Steps.Add(step);
+                    }
+                }
+                else
+                {
+                    throw new ApplicationException(string.Format("Invalid upgrade step XML for version [{0}]. No root XML node found for the XDoc. Returned XML body to parse: {1}", targetVersion, stepXml));
+                }
+            }
+            else
+            {
+                throw new ApplicationException("The upgrade step [{0}] was found but an empty string was returned.");
+            }
+
+            return versionStep;
+        }
+
+        #endregion
+    }
+}

@@ -57,6 +57,10 @@ namespace FullStack.Common
         }
         
         [Category("Context")]
+        [Description("Url to use when assigning claims, such as 'MySite.com' or 'YourSite.com'")]
+        public string BaseUrl { get; set; }
+
+        [Category("Context")]
         public string CompanyName { get; set; }
 
         [Category("Context")]
@@ -81,6 +85,10 @@ namespace FullStack.Common
                 throw new Exception(string.Format("Unknown key: [{0}]", this.ProjectName));
             }
         }
+
+        [Optional]
+        [Category("Context")]
+        public string ExceptionlessApiKey { get; set; }
 
         [Optional]
         [Category("Context")]
@@ -149,6 +157,24 @@ namespace FullStack.Common
         /// </param>
         public void AddAssemblyToProject(string projectPath, string assembly)
         {
+            this.AddAssemblyToProject(projectPath, assembly, string.Empty);   
+        }
+        
+        /// <summary>
+        ///     Adds the given file to the indicated project
+        /// </summary>
+        /// <param name="project">The path of the proj file</param>
+        /// <param name="projectSubDir">
+        ///     The subdirectory of the project that the
+        ///     file is located in, otherwise an empty string if it is at the project root
+        /// </param>
+        /// <param name="file">The name of the file to be added to the project</param>
+        /// <param name="parent">
+        ///     The name of the parent to group the file to, an
+        ///     empty string if there is no parent file
+        /// </param>
+        public void AddAssemblyToProject(string projectPath, string assembly, string hintPath)
+        {
             XDocument proj = XDocument.Load(projectPath);
 
             XNamespace ns = "http://schemas.microsoft.com/developer/msbuild/2003";
@@ -166,7 +192,11 @@ namespace FullStack.Common
             }
 
             var item = new XElement(ns + "Reference", new XAttribute("Include", assembly));
-
+            if (!string.IsNullOrEmpty(hintPath))
+            {
+                var hint = new XElement(ns + "HintPath", hintPath);               
+                item.Add(hint);
+            }
             itemGroup.Add(item);
 
             proj.Save(projectPath);
@@ -188,7 +218,7 @@ namespace FullStack.Common
         public void AddFileToProject(string projectPath, string projectSubDir, string file, string parent)
         {
              string modifier = "Compile";
-            if (file.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase)){
+            if (file.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".sql", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".xml", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase)){
                 modifier = "None";
             }
             

@@ -1,0 +1,129 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using System.Security.Claims;
+
+    /// <summary>
+    /// The <%= this.SolutionName %> claims identity.
+    /// </summary>
+    [ComVisible(true)]
+    [Serializable]
+    public class <%= this.SolutionName %>ClaimsIdentity : ClaimsIdentity
+    {
+        /// <summary>
+        /// Returns the ClaimsPrincipal current identity as an <%= this.SolutionName %>ClaimsIdentity. Nullable.
+        /// </summary>
+        public static <%= this.SolutionName %>ClaimsIdentity Current
+        {
+            get
+            {
+                // Attempts to cast the current identity as an <%= this.SolutionName %> identity
+                return ClaimsPrincipal.Current.Identity as <%= this.SolutionName %>ClaimsIdentity;
+
+                //TODO: null values should throw an error?
+            }
+        }
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="<%= this.SolutionName %>ClaimsIdentity"/> class.
+        /// </summary>
+        /// <param name="claims">
+        /// The claims.
+        /// </param>
+        /// <param name="authenticationType">
+        /// The authentication type.
+        /// </param>
+        public <%= this.SolutionName %>ClaimsIdentity(IList<Claim> claims, string authenticationType)
+            : base(claims, authenticationType)
+        {
+            this.Username = this.GetClaimValue(claims, ClaimTypes.Name);
+            this.Alias = this.GetClaimValue(claims, <%= this.SolutionName %>ClaimTypes.Alias);
+            this.Email = this.GetClaimValue(claims, ClaimTypes.Email);
+            this.UserId = int.Parse(this.GetClaimValue(claims, <%= this.SolutionName %>ClaimTypes.UserId));
+            this.Username = this.GetClaimValue(claims, ClaimTypes.Name);
+            this.IsAdmin = claims.Any(c => c.Type == ClaimTypes.Role && c.Value.Equals("Admin", StringComparison.OrdinalIgnoreCase));
+        }
+
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        ///    Gets or sets the current alias
+        /// </summary>
+        public string Alias { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the current user's email address
+        /// </summary>
+        public string Email { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether the current user is in an admin group
+        /// </summary>
+        public bool IsAdmin { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the current user ID
+        /// </summary>
+        public int UserId { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the current username
+        /// </summary>
+        public string Username { get; set; }
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// Gets the claim value.
+        /// </summary>
+        /// <param name="type">
+        /// Claim type of the claim
+        /// </param>
+        /// <returns>
+        /// Returns the claim value if the type is found, otherwise an empty string.
+        /// </returns>
+        public string GetClaimValue(string type)
+        {
+            return this.GetClaimValue(this.Claims, type);
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Attempts to get the claim value
+        /// </summary>
+        /// <param name="claims">
+        /// A list of claims to search through
+        /// </param>
+        /// <param name="type">
+        /// Claim type of the claim
+        /// </param>
+        /// <returns>
+        /// Returns the claim value if the type is found, otherwise an empty string.
+        /// </returns>
+        internal string GetClaimValue(IEnumerable<Claim> claims, string type)
+        {
+            string result = string.Empty;
+            if (claims != null && claims.Any(c => c.Type == type))
+            {
+                result = claims.First(c => c.Type == type).Value;
+            }
+
+            return result;
+        }
+
+        #endregion
+    }
+}

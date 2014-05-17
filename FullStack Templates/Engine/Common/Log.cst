@@ -1,0 +1,97 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
+{
+    using System.Reflection;
+
+    using log4net;
+
+    /// <summary>
+    /// Allows for the logging of messages to log4net which can pipe the output to MSMQ, text, events, databases, etc.
+    /// </summary>
+    public static class Log
+    {
+        #region Static Fields
+
+        /// <summary>
+        /// The _log.
+        /// </summary>
+        private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// Creates a debug entry in the log(s)
+        /// </summary>
+        /// <param name="message">
+        /// The message to log.
+        /// </param>
+        public static void Debug(string message)
+        {
+            if (_log != null)
+            {
+                _log.Debug(message);
+            }
+        }
+
+        /// <summary>
+        /// Creates an error entry in the log(s)
+        /// </summary>
+        /// <param name="message">
+        /// The message to log.
+        /// </param>
+        public static void Error(string message)
+        {
+            if (_log != null)
+            {
+                _log.Error(message);
+            }
+        }
+
+        /// <summary>
+        /// Creates a fatal entry in the log(s)
+        /// </summary>
+        /// <param name="message">
+        /// The message to log.
+        /// </param>
+        public static void Fatal(string message)
+        {
+            if (_log != null)
+            {
+                _log.Fatal(message);
+            }
+        }
+
+        /// <summary>
+        /// Creates an info entry in the log(s)
+        /// </summary>
+        /// <param name="message">
+        /// The message to log.
+        /// </param>
+        public static void Info(string message, params object[] args)
+        {
+            if (_log != null)
+            {
+                _log.Info(string.Format(message, args));
+            }
+        }
+
+        /// <summary>
+        /// Creates a warn entry in the log(s)
+        /// </summary>
+        /// <param name="message">
+        /// The message to log.
+        /// </param>
+        public static void Warn(string message)
+        {
+            if (_log != null)
+            {
+                _log.Warn(message);
+            }
+        }
+
+        #endregion
+    }
+}

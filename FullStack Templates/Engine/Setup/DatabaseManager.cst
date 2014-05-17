@@ -1,0 +1,350 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Setup
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Text;
+    using System.Threading;
+
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common;
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data;
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Resources;
+
+    using PetaPoco;
+
+    /// <summary>
+    ///     Allows work with the database.
+    /// </summary>
+    public class DatabaseManager
+    {
+        #region Public Methods and Operators
+
+        /// <summary>
+        ///     Deletes the database. Returns true if the database no longer exists;
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="bool" />.
+        /// </returns>
+        public static bool DeleteDatabase()
+        {
+            bool result = false;
+
+            // ONLY ALLOW DELETE IN DEBUG MODE
+#if DEBUG
+            if (DatabaseExists())
+            {
+                // The DB exists, so we can get an open connection at this point
+                using (IDbConnection conn = DbFactory.GetMasterDbConnection())
+                {
+                    if (DbFactory.GetProviderType() == DbProviderTypes.SqlServer)
+                    {
+                        string name = DbFactory.GetDbName();
+                        using (IDbCommand cmd = DbFactory.GetDbCommand(string.Format("ALTER DATABASE [{0}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [{0}]", name), conn))
+                        {
+                            cmd.ExecuteNonQueryBool();
+                        }
+                    }
+                }
+
+                int i = 0;
+                while (DatabaseExists() && i < 30)
+                {
+                    i++;
+                    Thread.Sleep(500);
+                }
+
+                result = !DatabaseExists();
+            }
+            else
+            {
+                // the database doesn't exist which is, effectively, the same as deleting it
+                result = true;
+            }
+
+#endif
+
+            return result;
+        }
+
+        /// <summary>
+        ///     Gets the current database version. Zero indicates no database exists.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="int" />.
+        /// </returns>
+        public static int GetVersion()
+        {
+            int version = 0;
+            if (DatabaseExists())
+            {
+                using (PetaPoco.Database db = DbFactory.GetDatabase())
+                {
+                    version = db.Single<int>(new Sql("SELECT TOP 1 [CurrentVersion] FROM Versions"));
+                }
+            }
+
+            return version;
+        }
+
+        /// <summary>
+        ///     Initializes the database - if it doesn't exist, it is created. If it exists, make sure it is on the correct
+        ///     version.
+        /// </summary>
+        /// <returns>
+        ///     Returns true if the database was initialized, otherwise false
+        /// </returns>
+        public static bool InitializeDatabase()
+        {
+            bool result = false;
+            int version = GetVersion();
+
+            if (version == 0)
+            {
+                // No database. We need to create one.
+                result = CreateDatabase(<%= this.SolutionName %>Config.CurrentVersion);
+            }
+            else if (version < <%= this.SolutionName %>Config.CurrentVersion)
+            {
+                // DatabaseManager is not current, we need to updrade
+                result = UpdgradeDatabase(version, <%= this.SolutionName %>Config.CurrentVersion);
+            }
+            else if (version > <%= this.SolutionName %>Config.CurrentVersion)
+            {
+                // DatabaseManager is a higher version, throw an error and alert to this fact
+                result = false;
+                throw new ApplicationException(string.Format("The database version is a higher version [{0}] than expected [{1}]", version, <%= this.SolutionName %>Config.CurrentVersion));
+            }
+            else if (version == <%= this.SolutionName %>Config.CurrentVersion)
+            {
+                // DatabaseManager is current, no work needed
+                result = true;
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Creates a new database
+        /// </summary>
+        /// <param name="targetVersion">
+        /// The target Version.
+        /// </param>
+        /// <returns>
+        /// Returns true if a database was created with the target version
+        /// </returns>
+        private static bool CreateDatabase(int targetVersion)
+        {
+            bool result = false;
+            UpgradeStepVersion stepVersion = UpgradeStepManager.GetUpgradeStepVersion(targetVersion);
+            if (stepVersion == null)
+            {
+                throw new ApplicationException("Unable to load the upgrade step [{0}] for creating a new database");
+            }
+
+            // Create the actual database first
+            using (IDbConnection conn = DbFactory.GetMasterDbConnection())
+            {
+                if (DbFactory.GetProviderType() == DbProviderTypes.SqlServer)
+                {
+                    string databaseName = DbFactory.GetDbName();
+                    using (IDbCommand cmd = DbFactory.GetDbCommand(string.Format("CREATE DATABASE [{0}]", databaseName), conn))
+                    {
+                        cmd.ExecuteNonQueryBool();
+                    }
+                }
+            }
+
+            while (!DatabaseExists())
+            {
+                Thread.Sleep(500);
+            }
+
+            // New databases will execute against the default database.
+            string connectionString = DbFactory.GetDefaultConnectionStringSetting().ConnectionString;
+
+            result = true;
+
+            // Run through all of the steps
+            foreach (UpgradeStep upgradeStep in stepVersion.Steps)
+            {
+                // There are two roles right now, DB and Class
+                if (upgradeStep.Role.Equals("db", StringComparison.OrdinalIgnoreCase))
+                {
+                    ExecuteDatabaseUpgradeStep(upgradeStep, stepVersion.Version, connectionString);
+                }
+                else
+                {
+                    throw new ApplicationException(string.Format("Unable to handle other upgrade step roles [{0}]: [{1}]", upgradeStep.Role, upgradeStep.ResourceName));
+                }
+            }
+
+            UpdateDatabaseVersion(targetVersion);
+
+            return result;
+        }
+
+        /// <summary>
+        ///     Determines if the default database exists
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="bool" />.
+        /// </returns>
+        private static bool DatabaseExists()
+        {
+            bool result = false;
+            DbProviderTypes providerType = DbFactory.GetProviderType();
+
+            // Currently, only SQL Server is supported
+            if (providerType == DbProviderTypes.SqlServer)
+            {
+                using (IDbConnection conn = DbFactory.GetMasterDbConnection())
+                {
+                    string dbName = DbFactory.GetDbName();
+                    using (IDbCommand cmd = DbFactory.GetDbCommand(string.Format("SELECT database_id FROM sys.databases WHERE Name = '{0}'", dbName), conn))
+                    {
+                        IDbDataParameter param = cmd.CreateParameter();
+                        param.ParameterName = "@dbName";
+                        param.Value = DbFactory.GetDbName();
+
+                        cmd.Parameters.Add(param);
+
+                        // Now open the connection
+                        if (conn.State != ConnectionState.Open)
+                        {
+                            conn.Open();
+                        }
+
+                        var foundDbId = cmd.ExecuteScalarTyped<int>();
+
+                        // if there is a database_id greater than 1, then the database exists
+                        result = foundDbId > 1;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Executes an upgrade step against a database. Throws on an error.
+        /// </summary>
+        /// <param name="upgradeStep">
+        /// The step you want to run through
+        /// </param>
+        /// <param name="version">
+        /// </param>
+        /// <param name="connectionString">
+        /// Connection string for the database to execute the upgrade step scripts against
+        /// </param>
+        private static void ExecuteDatabaseUpgradeStep(UpgradeStep upgradeStep, int version, string connectionString)
+        {
+            var sbSql = new StringBuilder();
+            List<string> lines = ResourceManager.GetResourceTextFileLines(upgradeStep.ResourceName);
+
+            // Connect to the specified database because we might be upgrading a temp database.
+            using (IDbConnection conn = DbFactory.GetDbConnection(connectionString))
+            {
+                using (IDbCommand cmd = DbFactory.GetDbCommand(conn))
+                {
+                    foreach (string sqlLine in lines)
+                    {
+                        if (sqlLine.Trim().Equals("GO", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (sbSql.Length > 0)
+                            {
+                                Log.Info("Executing: {0}", sbSql.ToString());
+
+                                cmd.CommandText = sbSql.ToString();
+
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            sbSql = new StringBuilder();
+                        }
+                        else
+                        {
+                            sbSql.AppendLine(sqlLine);
+                        }
+                    }
+
+                    // If any SQL is still left, execute it
+                    if (sbSql.Length > 0)
+                    {
+                        Log.Info("Executing: {0}", sbSql.ToString());
+
+                        cmd.CommandText = sbSql.ToString();
+
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    sbSql = new StringBuilder();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The update database version.
+        /// </summary>
+        /// <param name="version">
+        /// The version.
+        /// </param>
+        private static void UpdateDatabaseVersion(int version)
+        {
+            var sbSql = new StringBuilder();
+            sbSql.AppendLine("DECLARE @CurrentVersion INT;");
+            sbSql.AppendLine("SET @CurrentVersion = (SELECT TOP 1 CurrentVersion FROM [dbo].[Versions]);");
+            sbSql.AppendLine("IF @CurrentVersion IS NULL");
+            sbSql.AppendLine("BEGIN");
+            sbSql.AppendLine("  INSERT INTO [dbo].[Versions] (CurrentVersion) VALUES (@version);");
+            sbSql.AppendLine("END");
+            sbSql.AppendLine("ELSE");
+            sbSql.AppendLine("BEGIN");
+            sbSql.AppendLine("  UPDATE [dbo].[Versions] SET CurrentVersion=@version;");
+            sbSql.AppendLine("END");
+
+            string connectionString = DbFactory.GetDefaultConnectionStringSetting().ConnectionString;
+
+            using (IDbConnection conn = DbFactory.GetDbConnection(connectionString))
+            {
+                using (IDbCommand cmd = DbFactory.GetDbCommand(conn))
+                {
+                    Log.Info("Executing: {0}", sbSql.ToString());
+
+                    cmd.CommandText = sbSql.ToString();
+                    IDbDataParameter param = cmd.CreateParameter();
+                    param.ParameterName = "@version";
+                    param.Value = version;
+
+                    cmd.Parameters.Add(param);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Upgrades an existing database to the current version
+        /// </summary>
+        /// <param name="currentVersion">
+        /// The current Version.
+        /// </param>
+        /// <param name="targetVersion">
+        /// The target Version.
+        /// </param>
+        /// <returns>
+        /// Returns true if the database was upgrade <see cref="bool"/>.
+        /// </returns>
+        private static bool UpdgradeDatabase(int currentVersion, int targetVersion)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
+}

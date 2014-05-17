@@ -1,0 +1,28 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Data
+{
+    using System;
+    using System.Data;
+
+    internal static class DatabaseExtensions
+    {
+        public static bool ExecuteNonQueryBool(this IDbCommand cmd)
+        {
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
+        public static T ExecuteScalarTyped<T>(this IDbCommand cmd)
+        {
+            T result = default(T);
+
+            var dbResult = cmd.ExecuteScalar();
+            if (dbResult != DBNull.Value && dbResult != null)
+            {
+                result = (T)dbResult;
+            }
+
+            return result;
+        }
+    }
+}

@@ -1,0 +1,17 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
+{
+    public static class <%= this.SolutionName %>ClaimTypes
+    {
+        /// <summary>
+        /// The URI for a claim that specifies the user id of the authenticated user; http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>.com/identity/claims/userid.
+        /// </summary>
+        public const string UserId = "http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>/identity/claims/userid";
+
+        /// <summary>
+        /// The URI for a claim that specifies the alias of the authenticated user; http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>.com/identity/claims/alias.
+        /// </summary>
+        public const string Alias = "http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>/identity/claims/alias";
+    }
+}

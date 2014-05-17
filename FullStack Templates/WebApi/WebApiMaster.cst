@@ -48,6 +48,10 @@ public override void Render(TextWriter writer)
     {
         this.RenderTemplateToFile(this.Create<ProjectTemplate>(), projectLocation);
         
+        this.AddAssemblyToProject(projectLocation,"Exceptionless",@"..\packages\Exceptionless.1.4.1954\lib\net45\Exceptionless.dll");
+        this.AddAssemblyToProject(projectLocation,"Exceptionless.Models",@"..\packages\Exceptionless.1.4.1954\lib\net45\Exceptionless.Models.dll");
+        this.AddAssemblyToProject(projectLocation,"log4net",@"..\packages\log4net.2.0.3\lib\net40-full\log4net.dll");
+        
         string engineAlias = this.StackProjects["Engine"].Alias;
         this.AddProjectReferenceToProject(projectLocation, string.Format("../{0}/{0}.csproj",engineAlias), this.StackProjects["Engine"].ProjectGuid, engineAlias);
        

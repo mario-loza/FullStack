@@ -1,0 +1,77 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Resources
+{
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Reflection;
+
+    /// <summary>
+    /// The resource manager.
+    /// </summary>
+    internal static class ResourceManager
+    {
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// Reads all of the resource file into a string
+        /// </summary>
+        /// <param name="resourceName">
+        /// Name of the resource to get
+        /// </param>
+        /// <returns>
+        /// Returns the text from the file
+        /// </returns>
+        public static string GetResourceTextFile(string resourceName)
+        {
+            string content = string.Empty;
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream != null)
+                {
+                    using (var reader = new StreamReader(stream))
+                    {
+                        content = reader.ReadToEnd();
+                    }
+                }
+            }
+
+            return content;
+        }
+
+        /// <summary>
+        /// Reads all of the lines of resource file into a list of strings
+        /// </summary>
+        /// <param name="resourceName">
+        /// Name of the resource to get
+        /// </param>
+        /// <returns>
+        /// Returns each line of text as a separate string in a list of strings
+        /// </returns>
+        public static List<string> GetResourceTextFileLines(string resourceName)
+        {
+            var lines = new List<string>();
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream != null)
+                {
+                    using (var reader = new StreamReader(stream))
+                    {
+                        while (!reader.EndOfStream)
+                        {
+                            lines.Add(reader.ReadLine());
+                        }
+                    }
+                }
+            }
+
+            return lines;
+        }
+
+        #endregion
+    }
+}
