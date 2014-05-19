@@ -10,6 +10,7 @@
 <%@ Register Name="CoreApiTemplate" Template="Api\CoreApi.cst" %>
 <%@ Register Name="ClassApiTemplate" Template="Api\ClassApi.cst" %>
 <%@ Register Name="ApiResponseTemplate" Template="Api\Models\ApiResponse.cst" %>
+<%@ Register Name="ApiErrorTemplate" Template="Api\Models\ApiError.cst" %>
 <%@ Register Name="AuthorizationTokenTemplate" Template="Api\Models\AuthorizationToken.cst" %>
 <%@ Register Name="ApiBaseTemplate" Template="Common\ApiBase.cst" %>
 <%@ Register Name="LogTemplate" Template="Common\Log.cst" %>
@@ -50,6 +51,7 @@ public override void Render(TextWriter writer)
         this.BuildTemplate(this.Create<ApiCredentialsTemplate>(), projectLocation, "Api", "ApiCredentials.gen.cs", "ApiCredentials.cs");
         this.BuildTemplate(this.Create<CoreApiTemplate>(), projectLocation, "Api", this.ApiClassAlias + ".gen.cs", this.ApiClassAlias + ".cs");
         this.BuildTemplate(this.Create<ApiResponseTemplate>(), projectLocation, @"Api\Models", "ApiResponse.gen.cs", "ApiResponse.cs");
+        this.BuildTemplate(this.Create<ApiErrorTemplate>(), projectLocation, @"Api\Models", "ApiError.gen.cs", "ApiError.cs");
         this.BuildTemplate(this.Create<AuthorizationTokenTemplate>(), projectLocation, @"Api\Models", "AuthorizationTokenModel.gen.cs", "AuthorizationTokenModel.cs");
         this.BuildTemplate(this.Create<ApiBaseTemplate>(), projectLocation, "Common", "ApiBase.gen.cs", "ApiBase.cs");
         this.BuildTemplate(this.Create<LogTemplate>(), projectLocation, "Common", "Log.gen.cs", "Log.cs");

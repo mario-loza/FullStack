@@ -26,14 +26,12 @@ public override void Render(TextWriter writer)
     {
         this.RenderTemplateToFile(this.Create<ProjectTemplate>(), projectLocation);
         
-        
-        
         string clientAlias = this.StackProjects["Client"].Alias;
         this.AddProjectReferenceToProject(projectLocation, string.Format("../{0}/{0}.csproj",clientAlias), this.StackProjects["Client"].ProjectGuid, clientAlias);
        
         this.AddAssemblyToProject(projectLocation,"Exceptionless",@"..\packages\Exceptionless.1.4.1954\lib\net45\Exceptionless.dll");
-        this.AddAssemblyToProject(projectLocation,"Exceptionless.Models",@"..\packages\Exceptionless.1.4.1954\lib\net45\Exceptionless.Models.dll");
-        this.AddAssemblyToProject(projectLocation,"log4net",@"..\packages\log4net.2.0.3\lib\net40-full\log4net.dll");
+        this.AddAssemblyToProject(projectLocation, "Exceptionless.Models",@"..\packages\Exceptionless.1.4.1954\lib\net45\Exceptionless.Models.dll");
+        this.AddAssemblyToProject(projectLocation, "log4net",@"..\packages\log4net.2.0.3\lib\net40-full\log4net.dll");
         this.AddAssemblyToProject(projectLocation, "System.Net.Http");
         this.AddAssemblyToProject(projectLocation, "System.Net.Http.Formatting");
         this.AddAssemblyToProject(projectLocation, "Newtonsoft.Json");
@@ -63,7 +61,7 @@ public override void Render(TextWriter writer)
         {
             _currentStep = 1;
              
-            this.BuildCurrentTableTemplate(this.Create<TestTemplate>(), projectLocation,"Tests",string.Format("{0}Tests.gen.cs", this.CurrentTable.Name),string.Format("{0}Tests.cs", this.CurrentTable.Name));            
+            this.BuildCurrentTableTemplate(this.Create<TestTemplate>(), projectLocation,"Tests",string.Format("{0}Tests.cs", this.CurrentTable.Name),string.Empty);            
         }
     }
     

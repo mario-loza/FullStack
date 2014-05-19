@@ -1,0 +1,36 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models
+{
+    using System;
+       
+    public partial class ApiError
+    {
+        <% if (this.RenderBody) 
+        { // START RENDERBODY
+        %>
+         #region Constructors and Destructors
+
+        public ApiError()
+        {
+            this.StackTrace = string.Empty;
+            this.Message = string.Empty;
+        }
+
+        public ApiError(Exception ex)
+        {
+            this.Message = ex.ToString();
+            this.StackTrace = ex.StackTrace;
+        }
+
+        #endregion
+
+        #region Public Properties
+
+        public string Message { get; set; }
+        public string StackTrace { get; set; }
+
+        #endregion
+        <% } // END RENDERBODY %>        
+    }
+}

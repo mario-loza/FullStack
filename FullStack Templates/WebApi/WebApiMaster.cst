@@ -15,6 +15,7 @@
 <%@ Register Name="GlobalAsaxCsTemplate" Template="Root/Global.asax.cs.cst" %>
 
 <%@ Register Name="ApiResponseTemplate" Template="Models/ApiResponse.cst" %>
+<%@ Register Name="ApiErrorTemplate" Template="Models/ApiError.cst" %>
 
 <%@ Register Name="AppStartBundleConfigTemplate" Template="App_Start/BundleConfig.cst" %>
 <%@ Register Name="AppStartFilterConfigTemplate" Template="App_Start/FilterConfig.cst" %>
@@ -81,7 +82,9 @@ public override void Render(TextWriter writer)
         this.RenderTemplateToFile(this.Create<AppStartWebApiConfigTemplate>(), GetProjectOutputDirectory("App_Start","WebApiConfig.cs"));
         
         this.BuildCurrentTableTemplate(this.Create<AuthenticationControllerTemplate>(),projectLocation,"Controllers","AuthenticationController.gen.cs", "AuthenticationController.cs");
+
         this.BuildCurrentTableTemplate(this.Create<ApiResponseTemplate>(),projectLocation,"Models","ApiResponse.gen.cs", "ApiResponse.cs");
+        this.BuildCurrentTableTemplate(this.Create<ApiErrorTemplate>(),projectLocation,"Models","ApiError.gen.cs", "ApiError.cs");
         
       
   

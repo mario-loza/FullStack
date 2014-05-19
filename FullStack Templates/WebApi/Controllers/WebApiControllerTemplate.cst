@@ -42,33 +42,88 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
         
             public ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>> Get()
             {
-                return new ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>(this.ManagerService.Read());                
+                var response = new ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>();
+                try
+                {
+                    response = new ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>(this.ManagerService.Read());
+                }
+                catch (Exception ex)
+                {
+                    
+                    response.IsError = true;
+                    response.AddError(ex);
+                }
+                
+                return response;                
             }
 
             // GET api/<%= this.GetClassName(CurrentTable) %>/5
             public ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> Get(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
             {
-                return new ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>(this.ManagerService.Read(id));
+                var response = new ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>();
+                try
+                {
+                    response = new ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>(this.ManagerService.Read(id));
+                }
+                catch (Exception ex)
+                {
+                    
+                    response.IsError = true;
+                    response.AddError(ex);
+                }
+                
+                return response;                      
             }
 
             // POST api/<%= this.GetClassName(CurrentTable) %>
-            public void Post([FromBody]string value)
+            public  ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> Post(<%= this.GetModelClassName(CurrentTable) %> value)
             {
-                <%= this.GetModelClassName(CurrentTable) %> model = JsonConvert.DeserializeObject<<%= this.GetModelClassName(CurrentTable) %>>(value);
-                this.ManagerService.Create(model);
+                var response = new ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>();
+                try
+                {
+                    response = new ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>(this.ManagerService.Create(value));
+                }
+                catch (Exception ex)
+                {                    
+                    response.IsError = true;
+                    response.AddError(ex);
+                }
+                
+                return response;
             }
 
             // PUT api/<%= this.GetClassName(CurrentTable) %>/5
-            public void Put(<%= this.GetPrimaryKeyType(CurrentTable) %> id, [FromBody]string value)
+            public  ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> Put(<%= this.GetPrimaryKeyType(CurrentTable) %> id, <%= this.GetModelClassName(CurrentTable) %> value)
             {
-                <%= this.GetModelClassName(CurrentTable) %> model = JsonConvert.DeserializeObject<<%= this.GetModelClassName(CurrentTable) %>>(value);
-                this.ManagerService.Update(model);
+                var response = new ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>();
+                try
+                {
+                    response = new ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>(this.ManagerService.Update(value));
+                }
+                catch (Exception ex)
+                {                    
+                    response.IsError = true;
+                    response.AddError(ex);
+                }
+                
+                return response;
             }
 
             // DELETE api/<%= this.GetClassName(CurrentTable) %>/5
-            public void Delete(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+            public ApiResponse<bool> Delete(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
             {
-                this.ManagerService.Delete(id);
+                var response = new ApiResponse<bool>();
+                try
+                {
+                    response = new ApiResponse<bool>(this.ManagerService.Delete(id));
+                }
+                catch (Exception ex)
+                {                    
+                    response.IsError = true;
+                    response.AddError(ex);
+                }
+                
+                return response;
             }
        <% } // END RENDERBODY %>       
     }

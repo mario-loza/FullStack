@@ -3,20 +3,68 @@
 namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
        
     public partial class ApiResponse<T>
     {
         <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
-        
+          #region Fields
+
+        private List<ApiError> errors = new List<ApiError>();
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        public ApiResponse()
+        {
+            this.Result = default(T);
+            this.Resource = string.Empty;
+            this.IsError = false;
+            this.errors = new List<ApiError>();
+        }
+
+        public ApiResponse(T result)
+        {
+            this.Result = result;
+            this.Resource = string.Empty;
+            this.IsError = false;
+            this.errors = new List<ApiError>();
+        }
+
+        #endregion
+
         #region Public Properties
+
+        public IEnumerable<ApiError> Errors
+        {
+            get
+            {
+                return this.errors;
+            }
+            set
+            {
+                this.errors = value.ToList();
+            }
+        }
 
         public bool IsError { get; set; }
 
         public string Resource { get; set; }
 
         public T Result { get; set; }
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        public void AddError(Exception ex)
+        {
+            this.errors.Add(new ApiError(ex));
+        }
 
         #endregion
         <% } // END RENDERBODY %>        

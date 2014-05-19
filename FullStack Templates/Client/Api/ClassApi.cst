@@ -81,17 +81,68 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
 
         public async Task<<%= this.GetModelClassName(CurrentTable) %>> Create<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
         {
-            throw new NotImplementedException();
+            <%= this.GetModelClassName(CurrentTable) %> result = null;
+
+            using (var client = this.GetHttpClient())
+            {
+                HttpResponseMessage response = await client.PostAsJsonAsync("<% = CurrentTable.Name %>", value);
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResult = await response.Content.ReadAsStringAsync();
+                    ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> token = JsonConvert.DeserializeObject<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>>(jsonResult);
+
+                    if (!token.IsError)
+                    {
+                        result = token.Result;
+                    }
+                }
+            }
+
+            return result;
         }
 
         public async Task<<%= this.GetModelClassName(CurrentTable) %>> Update<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
         {
-            throw new NotImplementedException();
+             <%= this.GetModelClassName(CurrentTable) %> result = null;
+
+            using (var client = this.GetHttpClient())
+            {
+                HttpResponseMessage response = await client.PutAsJsonAsync(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "value.Id") %>)), value);
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResult = await response.Content.ReadAsStringAsync();
+                    ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> token = JsonConvert.DeserializeObject<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>>(jsonResult);
+
+                    if (!token.IsError)
+                    {
+                        result = token.Result;
+                    }
+                }
+            }
+
+            return result;
         }
 
-        public async Task<<%= this.GetModelClassName(CurrentTable) %>> Delete<%= this.GetModelClassName(CurrentTable) %>ById(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        public async Task<bool> Delete<%= this.GetModelClassName(CurrentTable) %>ById(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
         {
-            throw new NotImplementedException();
+            bool result = false;
+
+            using (var client = this.GetHttpClient())
+            {
+                HttpResponseMessage response = await client.DeleteAsync(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "id") %>)));
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResult = await response.Content.ReadAsStringAsync();
+                    ApiResponse<bool> token = JsonConvert.DeserializeObject<ApiResponse<bool>>(jsonResult); 
+
+                    if (!token.IsError)
+                    {
+                        result = token.Result;
+                    }
+                }
+            }
+
+            return result;
         }
 
         <% } // END RENDERBODY %>        
