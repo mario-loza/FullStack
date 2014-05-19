@@ -31,43 +31,63 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
         [Test]
         public void Get<%= this.GetModelClassName(CurrentTable) %>ByIdTest()
         {
-             var api = TestHelper.GetApi();
-
-            ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> result = null;
-            <%= this.GetPrimaryKeyType(CurrentTable) %> id;
-            Assert.Inconclusive();
+            <%= this.GetPrimaryKeyType(CurrentTable) %> id = 1;
+            
+            var api = TestHelper.GetApi();
+            var apiResult = api.<%= CurrentTable.Name %>.Get<% = this.GetClassName(this.CurrentTable) %>(id);
+            apiResult.Wait();
+            
+            ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> result = apiResult.Result;
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual(id, result.Result.Id);      
         }
 
         [Test]
         public void Create<%= this.GetModelClassName(CurrentTable) %>Test()
         {
-             var api = TestHelper.GetApi();
+            var newModel = new <%= this.GetModelClassName(CurrentTable) %>();
+            newModel.Id = 0;
 
-            <%= this.GetModelClassName(CurrentTable) %> actual;
-            <%= this.GetModelClassName(CurrentTable) %> expected;
-            Assert.Inconclusive();
+            var api = TestHelper.GetApi();
+            var apiResult = api.<%= CurrentTable.Name %>.Create<% = this.GetClassName(this.CurrentTable) %>(newModel);
+            apiResult.Wait();
+
+            ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> result = apiResult.Result;
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Result);
+            Assert.AreNotEqual(0, result.Result.Id);
         }
 
         [Test]
         public void Update<%= this.GetModelClassName(CurrentTable) %>Test()
         {
-             var api = TestHelper.GetApi();
+            var newModel = new <%= this.GetModelClassName(CurrentTable) %>();
+            newModel.Id = 0;
 
-            <%= this.GetPrimaryKeyType(CurrentTable) %> id;
-            <%= this.GetModelClassName(CurrentTable) %> actual;
-            <%= this.GetModelClassName(CurrentTable) %> expected;
-            Assert.Inconclusive();
+            var api = TestHelper.GetApi();
+            var apiResult = api.<%= CurrentTable.Name %>.Update<% = this.GetClassName(this.CurrentTable) %>(newModel);
+            apiResult.Wait();
+
+            ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> result = apiResult.Result;
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Result);
+            Assert.AreNotEqual(0, result.Result.Id);
         }
 
          [Test]
         public void Delete<%= this.GetModelClassName(CurrentTable) %>ByIdTest()
         {
+            <%= this.GetPrimaryKeyType(CurrentTable) %> id = 1;
+            
             var api = TestHelper.GetApi();
-
-            <%= this.GetPrimaryKeyType(CurrentTable) %> id;
-            <%= this.GetModelClassName(CurrentTable) %> actual;
-            <%= this.GetModelClassName(CurrentTable) %> expected;
-            Assert.Inconclusive();
+            var apiResult = api.<%= CurrentTable.Name %>.Delete<% = this.GetModelClassName(this.CurrentTable) %>ById(id);
+            apiResult.Wait();
+            
+            ApiResponse<bool> result = apiResult.Result;
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual(true, result.Result);      
         }     
     }   
 }
