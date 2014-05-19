@@ -22,8 +22,10 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
             var apiResult = api.<%= CurrentTable.Name %>.GetAll<%= CurrentTable.Name %>();
             apiResult.Wait();
             
-            IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> result = apiResult.Result;
-            Assert.IsTrue(result.Any());             
+            ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>> result = apiResult.Result;
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Result);
+            Assert.IsTrue(result.Result.Any());                          
         }
 
         [Test]
@@ -31,7 +33,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
         {
              var api = TestHelper.GetApi();
 
-            <%= this.GetModelClassName(CurrentTable) %> result = null;
+            ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> result = null;
             <%= this.GetPrimaryKeyType(CurrentTable) %> id;
             Assert.Inconclusive();
         }

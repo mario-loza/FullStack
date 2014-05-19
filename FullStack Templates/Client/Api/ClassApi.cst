@@ -35,114 +35,29 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
 
         #endregion
         
-        public async Task<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>> GetAll<%= CurrentTable.Name %>()
+        public async Task<ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>> GetAll<%= CurrentTable.Name %>()
         {
-            IEnumerable<<%= this.GetModelClassName(CurrentTable) %>> result = null;
-
-            using (var client = this.GetHttpClient())
-            {
-                HttpResponseMessage response = await client.GetAsync(string.Format("<% = CurrentTable.Name %>/"));
-                if (response.IsSuccessStatusCode)
-                {
-                    string jsonResult = await response.Content.ReadAsStringAsync();
-                    ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>> token = JsonConvert.DeserializeObject<ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>>(jsonResult);
-
-                    if (!token.IsError)
-                    {
-                        result = token.Result;
-                    }
-                }
-            }
-
-            return result;                     
+            return this.Get<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>("<% = CurrentTable.Name %>/").Result;                     
         }
 
-        public async Task<<%= this.GetModelClassName(CurrentTable) %>> Get<%= this.GetClassName(CurrentTable) %>(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        public async Task<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>> Get<%= this.GetClassName(CurrentTable) %>(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
         {
-            <%= this.GetModelClassName(CurrentTable) %> result = null;
-
-            using (var client = this.GetHttpClient())
-            {
-                HttpResponseMessage response = await client.GetAsync(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "id") %>)));
-                if (response.IsSuccessStatusCode)
-                {
-                    string jsonResult = await response.Content.ReadAsStringAsync();
-                    ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> token = JsonConvert.DeserializeObject<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>>(jsonResult);
-
-                    if (!token.IsError)
-                    {
-                        result = token.Result;
-                    }
-                }
-            }
-
-            return result;
+            return this.Get<<%= this.GetModelClassName(CurrentTable) %>>(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "id") %>))).Result;
         }
 
-        public async Task<<%= this.GetModelClassName(CurrentTable) %>> Create<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
+        public async Task<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>> Create<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
         {
-            <%= this.GetModelClassName(CurrentTable) %> result = null;
-
-            using (var client = this.GetHttpClient())
-            {
-                HttpResponseMessage response = await client.PostAsJsonAsync("<% = CurrentTable.Name %>", value);
-                if (response.IsSuccessStatusCode)
-                {
-                    string jsonResult = await response.Content.ReadAsStringAsync();
-                    ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> token = JsonConvert.DeserializeObject<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>>(jsonResult);
-
-                    if (!token.IsError)
-                    {
-                        result = token.Result;
-                    }
-                }
-            }
-
-            return result;
+            return this.Post("<% = CurrentTable.Name %>", value).Result;
         }
 
-        public async Task<<%= this.GetModelClassName(CurrentTable) %>> Update<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
+        public async Task<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>> Update<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
         {
-             <%= this.GetModelClassName(CurrentTable) %> result = null;
-
-            using (var client = this.GetHttpClient())
-            {
-                HttpResponseMessage response = await client.PutAsJsonAsync(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "value.Id") %>)), value);
-                if (response.IsSuccessStatusCode)
-                {
-                    string jsonResult = await response.Content.ReadAsStringAsync();
-                    ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> token = JsonConvert.DeserializeObject<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>>(jsonResult);
-
-                    if (!token.IsError)
-                    {
-                        result = token.Result;
-                    }
-                }
-            }
-
-            return result;
+            return this.Put(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "value.Id") %>)), value).Result;            
         }
 
-        public async Task<bool> Delete<%= this.GetModelClassName(CurrentTable) %>ById(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        public async Task<ApiResponse<bool>> Delete<%= this.GetModelClassName(CurrentTable) %>ById(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
         {
-            bool result = false;
-
-            using (var client = this.GetHttpClient())
-            {
-                HttpResponseMessage response = await client.DeleteAsync(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "id") %>)));
-                if (response.IsSuccessStatusCode)
-                {
-                    string jsonResult = await response.Content.ReadAsStringAsync();
-                    ApiResponse<bool> token = JsonConvert.DeserializeObject<ApiResponse<bool>>(jsonResult); 
-
-                    if (!token.IsError)
-                    {
-                        result = token.Result;
-                    }
-                }
-            }
-
-            return result;
+            return this.Delete(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "id") %>))).Result;           
         }
 
         <% } // END RENDERBODY %>        

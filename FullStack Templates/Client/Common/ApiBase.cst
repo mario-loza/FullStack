@@ -5,15 +5,19 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
     using System;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Threading.Tasks;
+    
+    using Newtonsoft.Json;
 
     using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api;
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models;
     
     public abstract partial class ApiBase
     {
         <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
-         #region Public Properties
+            #region Public Properties
 
         public DateTime SessionExpiration
         {
@@ -35,6 +39,54 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
 
         #region Methods
 
+        protected async Task<ApiResponse<bool>> Delete(string relativeUrl)
+        {
+            ApiResponse<bool> result = null;
+            using (HttpClient client = this.GetHttpClient())
+            {
+                HttpResponseMessage response = await client.DeleteAsync(relativeUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResult = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<ApiResponse<bool>>(jsonResult);
+
+                    if (result.IsError)
+                    {
+                        foreach (ApiError error in result.Errors)
+                        {
+                            Log.Error(error.Message);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        protected async Task<ApiResponse<T>> Get<T>(string relativeUrl)
+        {
+            ApiResponse<T> result = null;
+            using (HttpClient client = this.GetHttpClient())
+            {
+                HttpResponseMessage response = await client.GetAsync(relativeUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResult = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<ApiResponse<T>>(jsonResult);
+
+                    if (result.IsError)
+                    {
+                        foreach (ApiError error in result.Errors)
+                        {
+                            Log.Error(error.Message);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
         protected HttpClient GetHttpClient()
         {
             var client = new HttpClient();
@@ -44,6 +96,54 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             return client;
+        }
+
+        protected async Task<ApiResponse<T>> Post<T>(string relativeUrl, T value)
+        {
+            ApiResponse<T> result = null;
+            using (HttpClient client = this.GetHttpClient())
+            {
+                HttpResponseMessage response = await client.PostAsJsonAsync(relativeUrl, value);
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResult = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<ApiResponse<T>>(jsonResult);
+
+                    if (result.IsError)
+                    {
+                        foreach (ApiError error in result.Errors)
+                        {
+                            Log.Error(error.Message);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        protected async Task<ApiResponse<T>> Put<T>(string relativeUrl, T value)
+        {
+            ApiResponse<T> result = null;
+            using (HttpClient client = this.GetHttpClient())
+            {
+                HttpResponseMessage response = await client.PutAsJsonAsync(relativeUrl, value);
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResult = await response.Content.ReadAsStringAsync();
+                    result = JsonConvert.DeserializeObject<ApiResponse<T>>(jsonResult);
+
+                    if (result.IsError)
+                    {
+                        foreach (ApiError error in result.Errors)
+                        {
+                            Log.Error(error.Message);
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
 
         #endregion
