@@ -5,6 +5,8 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models
 {
     using System;
     
+    using Newtonsoft.Json;
+
     public partial class <%= this.GetModelClassName(CurrentTable) %>
     {
          <% if (this.RenderBody) 
@@ -12,8 +14,18 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api.Models
         %>
         #region Public Properties
     
-        public <%= GetPrimaryKeyType(CurrentTable) %> Id { get; set; }
-		<% for (int i = 0; i < CurrentTable.NonPrimaryKeyColumns.Count; i++) { %>
+        [JsonProperty]
+        public <%= GetPrimaryKeyType(CurrentTable) %> Id { get; private set; }
+		
+        <% for (int i = 0; i < CurrentTable.NonPrimaryKeyColumns.Count; i++) { %>
+        /// <summary>
+        <% if (!CurrentTable.NonPrimaryKeyColumns[i].AllowDBNull) { %>
+        /// Required
+        <%  } else {
+        %>
+        /// Optional
+        <% } %>
+        /// </summary>
         public <%= GetCSharpVariableType(CurrentTable.NonPrimaryKeyColumns[i]) %> <%= GetPropertyName(CurrentTable.NonPrimaryKeyColumns[i]) %> { get; set; }
 		<% if (i < CurrentTable.NonPrimaryKeyColumns.Count - 1) Response.Write("\r\n"); %>		
 		<% } %>

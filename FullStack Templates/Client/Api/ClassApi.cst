@@ -35,30 +35,71 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
 
         #endregion
         
-        public async Task<ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>> GetAll<%= CurrentTable.Name %>()
+        public async Task<ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>> GetAll<%= CurrentTable.Name %>Async()
         {
             return this.Get<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>>("<% = CurrentTable.Name %>/").Result;                     
         }
 
-        public async Task<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>> Get<%= this.GetClassName(CurrentTable) %>(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        public ApiResponse<IEnumerable<<%= this.GetModelClassName(CurrentTable) %>>> GetAll<%= CurrentTable.Name %>()
+        {
+            var apiResult = this.GetAll<%= CurrentTable.Name %>Async();
+            apiResult.Wait();
+            
+            return apiResult.Result;
+        }
+        
+        public async Task<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>> Get<%= this.GetClassName(CurrentTable) %>Async(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
         {
             return this.Get<<%= this.GetModelClassName(CurrentTable) %>>(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "id") %>))).Result;
         }
 
-        public async Task<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>> Create<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
+        public ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> Get<%= this.GetClassName(CurrentTable) %>(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        {
+            var apiResult = Get<%= this.GetClassName(CurrentTable) %>Async(id);
+            apiResult.Wait();
+            
+            return apiResult.Result;
+        }
+        
+        public async Task<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>> Create<%= this.GetClassName(CurrentTable) %>Async(<%= this.GetModelClassName(CurrentTable) %> value)
         {
             return this.Post("<% = CurrentTable.Name %>", value).Result;
         }
+        
+        public ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> Create<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
+        {
+            var apiResult = this.Create<%= this.GetClassName(CurrentTable) %>Async(value);
+            apiResult.Wait();
+            
+            return apiResult.Result;
+        }
 
-        public async Task<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>> Update<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
+        public async Task<ApiResponse<<%= this.GetModelClassName(CurrentTable) %>>> Update<%= this.GetClassName(CurrentTable) %>Async(<%= this.GetModelClassName(CurrentTable) %> value)
         {
             return this.Put(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "value.Id") %>)), value).Result;            
         }
+        
+        public ApiResponse<<%= this.GetModelClassName(CurrentTable) %>> Update<%= this.GetClassName(CurrentTable) %>(<%= this.GetModelClassName(CurrentTable) %> value)
+        {
+            var apiResult = this. Update<%= this.GetClassName(CurrentTable) %>Async(value);            
+            apiResult.Wait();
+            
+            return apiResult.Result;
+        }
 
-        public async Task<ApiResponse<bool>> Delete<%= this.GetModelClassName(CurrentTable) %>ById(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        public async Task<ApiResponse<bool>> Delete<%= this.GetModelClassName(CurrentTable) %>ByIdAsync(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
         {
             return this.Delete(string.Format("<% = CurrentTable.Name %>/{0}", WebUtility.HtmlEncode(<%= this.GetPrimaryKeyToString(CurrentTable, "id") %>))).Result;           
         }
+        
+        public ApiResponse<bool> Delete<%= this.GetModelClassName(CurrentTable) %>ById(<%= this.GetPrimaryKeyType(CurrentTable) %> id)
+        {
+            var apiResult = this.Delete<%= this.GetModelClassName(CurrentTable) %>ByIdAsync(id);
+            apiResult.Wait();
+            
+            return apiResult.Result;
+        }
+
 
         <% } // END RENDERBODY %>        
     }
