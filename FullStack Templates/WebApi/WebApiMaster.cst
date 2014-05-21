@@ -9,6 +9,8 @@
 
 <%@ Register Name="ViewsWebConfigTemplate" Template="Views/Web.config.cst" %>
 
+<%@ Register Name="BasicAuthenticationFilterTemplate" Template="Filters/BasicAuthenticationFilter.cst" %>
+
 <%@ Register Name="RootWebConfigTemplate" Template="Root/Web.config.cst" %>
 
 <%@ Register Name="GlobalAsaxTemplate" Template="Root/Global.asax.cst" %>
@@ -36,6 +38,7 @@ public override void Render(TextWriter writer)
     this.ClearDirectory(GetProjectOutputDirectory("Areas"));
     this.ClearDirectory(GetProjectOutputDirectory("Content"));
     this.ClearDirectory(GetProjectOutputDirectory("Controllers"));
+    this.ClearDirectory(GetProjectOutputDirectory("Filters"));
     this.ClearDirectory(GetProjectOutputDirectory("fonts"));
     this.ClearDirectory(GetProjectOutputDirectory("Models"));
     this.ClearDirectory(GetProjectOutputDirectory("Scripts"));
@@ -64,7 +67,6 @@ public override void Render(TextWriter writer)
         this.CopyNonTemplateFilesToFolder("Views", "Views");
         this.CopyNonTemplateFilesToFolder(Path.Combine("Views","Home"), Path.Combine("Views","Home"));
         this.CopyNonTemplateFilesToFolder(Path.Combine("Views","Shared"), Path.Combine("Views","Shared"));
-      
         
         this.RenderTemplateToFile(this.Create<RootWebConfigTemplate>(), GetProjectOutputDirectory("","Web.config"));
         
@@ -83,11 +85,10 @@ public override void Render(TextWriter writer)
         
         this.BuildCurrentTableTemplate(this.Create<AuthenticationControllerTemplate>(),projectLocation,"Controllers","AuthenticationController.gen.cs", "AuthenticationController.cs");
 
+        this.BuildCurrentTableTemplate(this.Create<BasicAuthenticationFilterTemplate>(),projectLocation,"Filters", this.SolutionName + "AuthenticationFilterAttribute.cs", string.Empty);
+        
         this.BuildCurrentTableTemplate(this.Create<ApiResponseTemplate>(),projectLocation,"Models","ApiResponse.gen.cs", "ApiResponse.cs");
         this.BuildCurrentTableTemplate(this.Create<ApiErrorTemplate>(),projectLocation,"Models","ApiError.gen.cs", "ApiError.cs");
-        
-      
-  
         
     }
 

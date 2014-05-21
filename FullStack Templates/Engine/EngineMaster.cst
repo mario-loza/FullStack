@@ -3,6 +3,7 @@
 <%@ Register Name="Common_Log" Template="Common\Log.cst" %>
 <%@ Register Name="Common_ClaimTypes" Template="Common\ClaimTypes.cst" %>
 <%@ Register Name="Common_ClaimsIdentity" Template="Common\ClaimsIdentity.cst" %>
+<%@ Register Name="Common_Principal" Template="Common\Principal.cst" %>
 
 <%@ Register Name="Data_AuthenticationDataClass" Template="Data\AuthenticationDataClass.cst" %>
 <%@ Register Name="Data_AuthenticationDataInterface" Template="Data\AuthenticationDataInterface.cst" %>
@@ -94,6 +95,7 @@ public override void Render(TextWriter writer)
     
     this.BuildCurrentTableTemplate(this.Create<Common_ClaimsIdentity>(),projectLocation,"Common",this.SolutionName + "ClaimsIdentity.cs", string.Empty);
     this.BuildCurrentTableTemplate(this.Create<Common_ClaimTypes>(),projectLocation,"Common",this.SolutionName + "ClaimTypes.cs", string.Empty);
+    this.BuildCurrentTableTemplate(this.Create<Common_Principal>(),projectLocation,"Common",this.SolutionName + "Principal.cs", string.Empty);
     this.BuildCurrentTableTemplate(this.Create<Common_Log>(),projectLocation,"Common","Log.cs", string.Empty);
     
     this.BuildCurrentTableTemplate(this.Create<Data_AuthenticationDataClass>(),projectLocation,"Data","AuthenticationDataBase.gen.cs","AuthenticationData.cs");

@@ -1,0 +1,138 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Filters
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Security.Claims;
+    using System.Text;
+    using System.Web.Http.Controllers;
+    using System.Web.Http.Filters;
+
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Common;
+
+    /// <summary>
+    /// Based on Rick Strahl's blog entry: http://weblog.west-wind.com/posts/2013/Apr/18/A-WebAPI-Basic-Authentication-Authorization-Filter
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+    public class <%= this.SolutionName %>AuthenticationFilterAttribute : AuthorizationFilterAttribute
+    {
+        private bool _active = true;
+
+        /// <summary>
+        /// Overriden constructor to allow explicit disabling of this
+        /// filter's behavior. Pass false to disable (same as no filter
+        /// but declarative)
+        /// </summary>
+        /// <param name="active"></param>
+        public <%= this.SolutionName %>AuthenticationFilterAttribute(bool active)
+        {
+            this._active = active;
+        }
+
+        public <%= this.SolutionName %>AuthenticationFilterAttribute()
+        {
+            
+        }
+
+        /// <summary>
+        /// Override to Web API filter method to handle Basic Auth check
+        /// </summary>
+        /// <param name="actionContext"></param>
+        public override void OnAuthorization(HttpActionContext actionContext)
+        {
+            if (_active)
+            {
+                var identity = ParseAuthorizationHeader(actionContext);
+                if (identity == null)
+                {
+                    Challenge(actionContext);
+                    return;
+                }
+
+
+                if (!OnAuthorizeUser(identity.GetClaimValue(<%= this.SolutionName %>ClaimTypes.DeveloperId), identity.GetClaimValue(<%= this.SolutionName %>ClaimTypes.SessionKey), actionContext))
+                {
+                    Challenge(actionContext);
+                    return;
+                }
+
+                var principal = new <%= this.SolutionName %>Principal(identity, null);
+
+                System.Threading.Thread.CurrentPrincipal = principal;
+
+                // inside of ASP.NET this is required
+                //if (HttpContext.Current != null)
+                //    HttpContext.Current.User = principal;
+
+                base.OnAuthorization(actionContext);
+            }
+        }
+
+        /// <summary>
+        /// Base implementation for user authentication - you probably will
+        /// want to override this method for application specific logic.
+        /// 
+        /// The base implementation merely checks for username and password
+        /// present and set the Thread principal.
+        /// 
+        /// Override this method if you want to customize Authentication
+        /// and store user data as needed in a Thread Principle or other
+        /// Request specific storage.
+        /// </summary>
+        /// <param name="developerId"></param>
+        /// <param name="sessionKey"></param>
+        /// <param name="actionContext"></param>
+        /// <returns></returns>
+        protected virtual bool OnAuthorizeUser(string developerId, string sessionKey, HttpActionContext actionContext)
+        {
+            if (string.IsNullOrEmpty(developerId) || string.IsNullOrEmpty(sessionKey))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Parses the Authorization header and creates user credentials
+        /// </summary>
+        /// <param name="actionContext"></param>
+        protected virtual <%= this.SolutionName %>ClaimsIdentity ParseAuthorizationHeader(HttpActionContext actionContext)
+        {
+            string authHeader = null;
+            var auth = actionContext.Request.Headers.Authorization;
+            if (auth != null && auth.Scheme == "Basic")
+                authHeader = auth.Parameter;
+
+            if (string.IsNullOrEmpty(authHeader))
+                return null;
+
+            authHeader = Encoding.Default.GetString(Convert.FromBase64String(authHeader));
+
+            var tokens = authHeader.Split(':');
+            if (tokens.Length < 2)
+                return null;
+
+            List<System.Security.Claims.Claim> claims = new List<Claim>();
+            claims.Add(new Claim(<%= this.SolutionName %>ClaimTypes.DeveloperId,tokens[0]));
+            claims.Add(new Claim(<%= this.SolutionName %>ClaimTypes.SessionKey, tokens[1]));
+            return new <%= this.SolutionName %>ClaimsIdentity(claims, "http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>.com");
+        }
+
+
+        /// <summary>
+        /// Send the Authentication Challenge request
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="actionContext"></param>
+        void Challenge(HttpActionContext actionContext)
+        {
+            var host = actionContext.Request.RequestUri.DnsSafeHost;
+            actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized);
+            actionContext.Response.Headers.Add("WWW-Authenticate", string.Format("Basic realm=\"{0}\"", host));
+        }
+
+    }
+}

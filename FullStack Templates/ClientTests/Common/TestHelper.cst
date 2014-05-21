@@ -21,7 +21,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
         /// </returns>
         public static <% = this.ApiClassAlias %> GetApi()
         {
-            var result = <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Authentication.Login(TestConstants.AdminUsername, TestConstants.AdminPassword, TestConstants.TestUrl);
+            var result = <%= this.SolutionName %>.<%= this.StackProjects["Client"].Alias %>.Authentication.Login(TestConstants.AdminUsername, TestConstants.AdminPassword, TestConstants.TestUrl, TestConstants.DeveloperId);
             result.Wait();
             return result.Result;
         }

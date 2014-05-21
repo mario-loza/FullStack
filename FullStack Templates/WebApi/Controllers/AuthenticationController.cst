@@ -11,11 +11,16 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
     
     using Newtonsoft.Json;
 
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Filters;
     using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Models;
     
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;     
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services;
     
+     <% if (this.RenderBody) 
+     { %>
+    [<%= this.SolutionName %>AuthenticationFilter(false)]
+    <% } %>
     public partial class <%= this.GetClassName("Authentication") %>Controller <% this.RenderBodyWrite(": ApiController",string.Empty); %>
     {
         <% if (this.RenderBody) 

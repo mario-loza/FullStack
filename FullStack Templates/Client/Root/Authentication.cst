@@ -17,12 +17,12 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
         <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
-        public static async Task<<% = this.ApiClassAlias %>> Login(string username, string password, string apiBaseUrl)
+        public static async Task<<% = this.ApiClassAlias %>> Login(string username, string password, string apiBaseUrl, string apiDeveloperId)
         {
             <% = this.ApiClassAlias %> api = null;
             try
             {
-                using (var client = GetHttpClient(apiBaseUrl))
+                using (var client = GetHttpClient(apiBaseUrl, apiDeveloperId))
                 {
                     var body = new { username, password };
                     HttpResponseMessage response = await client.PostAsJsonAsync("authentication", body);
@@ -33,7 +33,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
 
                         if (!apiResponse.IsError)
                         {
-                            api = new <% = this.ApiClassAlias %>(apiResponse.Result.SessionKey, apiResponse.Result.Expiration, apiBaseUrl);
+                            api = new <% = this.ApiClassAlias %>(apiResponse.Result.SessionKey, apiResponse.Result.Expiration, apiBaseUrl, apiDeveloperId);
                             
                         }
                         
@@ -52,11 +52,11 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
 
 
 
-        private static HttpClient GetHttpClient(string baseUrl)
+        private static HttpClient GetHttpClient(string baseUrl, string developerId)
         {
             HttpClient client = new HttpClient();
 
-            ApiCredentials.SetCredentials(string.Empty, DateTime.UtcNow.AddDays(-5), baseUrl);
+            ApiCredentials.SetCredentials(string.Empty, DateTime.UtcNow.AddDays(-5), baseUrl, developerId);
 
             client.BaseAddress = new Uri(ApiCredentials.ApiUrl);
             client.DefaultRequestHeaders.Accept.Clear();

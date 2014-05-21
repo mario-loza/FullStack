@@ -42,12 +42,19 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
         public <%= this.SolutionName %>ClaimsIdentity(IList<Claim> claims, string authenticationType)
             : base(claims, authenticationType)
         {
+            this.DeveloperId = this.GetClaimValue(claims, <%= this.SolutionName %>ClaimTypes.DeveloperId);
+            this.SessionKey = this.GetClaimValue(claims, <%= this.SolutionName %>ClaimTypes.SessionKey);
             this.Username = this.GetClaimValue(claims, ClaimTypes.Name);
             this.Alias = this.GetClaimValue(claims, <%= this.SolutionName %>ClaimTypes.Alias);
             this.Email = this.GetClaimValue(claims, ClaimTypes.Email);
-            this.UserId = int.Parse(this.GetClaimValue(claims, <%= this.SolutionName %>ClaimTypes.UserId));
+          
+            int userId = 0;
+            int.TryParse(this.GetClaimValue(claims, <%= this.SolutionName %>ClaimTypes.UserId), out userId);
+            this.UserId = userId;
+
             this.Username = this.GetClaimValue(claims, ClaimTypes.Name);
             this.IsAdmin = claims.Any(c => c.Type == ClaimTypes.Role && c.Value.Equals("Admin", StringComparison.OrdinalIgnoreCase));
+            
         }
 
         #endregion
@@ -58,6 +65,11 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
         ///    Gets or sets the current alias
         /// </summary>
         public string Alias { get; set; }
+        
+        /// <summary>
+        ///    Gets or sets the current developer Id
+        /// </summary>
+        public string DeveloperId { get; set; }
 
         /// <summary>
         ///     Gets or sets the current user's email address
@@ -68,6 +80,11 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
         ///     Gets or sets a value indicating whether the current user is in an admin group
         /// </summary>
         public bool IsAdmin { get; set; }
+
+        /// <summary>
+        ///    Gets or sets the current session key
+        /// </summary>
+        public string SessionKey { get; set; }
 
         /// <summary>
         ///     Gets or sets the current user ID

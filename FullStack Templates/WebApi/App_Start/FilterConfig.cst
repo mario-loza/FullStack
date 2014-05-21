@@ -5,11 +5,13 @@ using System.Web.Mvc;
 
 namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
 {
+    using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Filters;
+    
     public class FilterConfig
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
-            filters.Add(new HandleErrorAttribute());
+           filters.Add(new HandleErrorAttribute());
         }
     }
 }

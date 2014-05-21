@@ -14,7 +14,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
         <% if (this.RenderBody) 
         { // START RENDERBODY
         %>
-          #region Constructors and Destructors
+        #region Constructors and Destructors
 
 
         /// <summary>
@@ -23,9 +23,9 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
         /// <param name="sessionKey"></param>
         /// <param name="sessionExpiration"></param>
         /// <param name="url"></param>
-        internal <% = this.ApiClassAlias %>(string sessionKey, DateTime sessionExpiration, string url)
+        internal <% = this.ApiClassAlias %>(string sessionKey, DateTime sessionExpiration, string url, string developerId)
         {
-            ApiCredentials.SetCredentials(sessionKey, sessionExpiration, url);
+            ApiCredentials.SetCredentials(sessionKey, sessionExpiration, url, developerId);
 
             <%
             foreach(TableSchema table in this.SourceDatabase.Tables)

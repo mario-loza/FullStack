@@ -13,5 +13,16 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
         /// The URI for a claim that specifies the alias of the authenticated user; http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>.com/identity/claims/alias.
         /// </summary>
         public const string Alias = "http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>/identity/claims/alias";
+        
+        /// <summary>
+        /// The URI for a claim that specifies the developerid of the authenticated user; http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>.com/identity/claims/developerid.
+        /// </summary>
+        public const string DeveloperId = "http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>/identity/claims/developerid";
+        
+        /// <summary>
+        /// The URI for a claim that specifies the sessionkey of the authenticated user; http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>.com/identity/claims/sessionkey.
+        /// </summary>
+        public const string SessionKey = "http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>/identity/claims/sessionkey";
+        
     }
 }

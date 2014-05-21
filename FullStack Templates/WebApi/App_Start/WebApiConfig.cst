@@ -7,12 +7,15 @@ using System.Web.Http;
 
 namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>
 {
-    public static class WebApiConfig
-    {
+   using <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Filters;
+  
+   public static class WebApiConfig
+   {
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
-
+            config.Filters.Add(new <%= this.SolutionName %>AuthenticationFilterAttribute()); 
+            
             // Web API routes
             config.MapHttpAttributeRoutes();
 

@@ -1,0 +1,19 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" CompilerVersion="v4.0" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
+{
+    using System;
+    using System.Security.Principal;
+
+    /// <summary>
+    /// The <%= this.SolutionName %> principal object.
+    /// </summary>
+    [Serializable]
+    public class <%= this.SolutionName %>Principal : GenericPrincipal
+    {
+        public <%= this.SolutionName %>Principal(IIdentity identity, string[] roles)
+            : base(identity, roles)
+        {
+        }
+    }
+}

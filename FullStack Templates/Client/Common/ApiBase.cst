@@ -89,12 +89,16 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Common
 
         protected HttpClient GetHttpClient()
         {
+            byte[] authBytes = System.Text.Encoding.UTF8.GetBytes(string.Format("{0}:{1}", ApiCredentials.DeveloperId, ApiCredentials.SessionKey));
+            // convert the byte array to a Base64 string
+            string base64Auth = Convert.ToBase64String(authBytes);
+
             var client = new HttpClient();
 
             client.BaseAddress = new Uri(ApiCredentials.ApiUrl);
             client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));            
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64Auth);
             return client;
         }
 
