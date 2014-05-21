@@ -54,7 +54,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Filters
                 }
 
 
-                if (!OnAuthorizeUser(identity.GetClaimValue(<%= this.SolutionName %>ClaimTypes.DeveloperId), identity.GetClaimValue(<%= this.SolutionName %>ClaimTypes.SessionKey), actionContext))
+                if (!OnAuthorizeUser(identity.DeveloperId, identity.SessionKey, actionContext))
                 {
                     Challenge(actionContext);
                     return;
@@ -65,8 +65,10 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Filters
                 System.Threading.Thread.CurrentPrincipal = principal;
 
                 // inside of ASP.NET this is required
-                //if (HttpContext.Current != null)
-                //    HttpContext.Current.User = principal;
+                if (System.Web.HttpContext.Current != null)
+                {
+                    System.Web.HttpContext.Current.User = principal;
+                }
 
                 base.OnAuthorization(actionContext);
             }
@@ -118,7 +120,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Filters
             List<System.Security.Claims.Claim> claims = new List<Claim>();
             claims.Add(new Claim(<%= this.SolutionName %>ClaimTypes.DeveloperId,tokens[0]));
             claims.Add(new Claim(<%= this.SolutionName %>ClaimTypes.SessionKey, tokens[1]));
-            return new <%= this.SolutionName %>ClaimsIdentity(claims, "http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>.com");
+            return new <%= this.SolutionName %>ClaimsIdentity(claims, "http://schemas.<%= this.SolutionName %>.<% = this.BaseUrl %>");
         }
 
 
