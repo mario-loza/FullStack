@@ -119,7 +119,13 @@ namespace FullStack.Common
                 this._outputDirectory = value;
             }
         }
-
+        
+         [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [Optional]
+        [Category("Context")]
+        [Description("If this is populated, these files will be copied to the resource/database/v1 folder of the engine project. The names of the files should match the existing database files")]
+        public string DatabaseSetupFilesDirectory { get; set; }
+        
         [Optional]
         [Category("InProcess")]
         public string ProjectName { get; set; }

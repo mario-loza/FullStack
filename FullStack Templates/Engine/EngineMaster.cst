@@ -86,11 +86,27 @@ public override void Render(TextWriter writer)
     this.AddFileToProject(projectLocation,"Resources","log4net.config", string.Empty);
     
     
-    string[] dbFiles = new []{"Indexes.sql","SeedData.sql", "Steps.xml", "StoredProcs.sql", "Tables.sql"};
-    foreach (var dbFile in dbFiles)
+   //string[] dbFiles = new []{"Indexes.sql","SeedData.sql", "Steps.xml", "StoredProcs.sql", "Tables.sql"};
+  
+    string sourceDbFileDirectory = Path.Combine(this.CodeTemplateInfo.DirectoryName,"Resources","Database","v1");
+    
+    if (!string.IsNullOrEmpty(this.DatabaseSetupFilesDirectory))
+    {
+        if (Directory.Exists(this.DatabaseSetupFilesDirectory))
+        {
+            if (File.Exists(Path.Combine(this.DatabaseSetupFilesDirectory, "Steps.xml")))
+            {
+                sourceDbFileDirectory = this.DatabaseSetupFilesDirectory;
+            }    
+        }
+    }
+    
+    foreach (var sourceFilePath in Directory.GetFiles(sourceDbFileDirectory))
   	{
-  	    File.Copy(Path.Combine(this.CodeTemplateInfo.DirectoryName,"Resources","Database","v1",dbFile),Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Resources","Database","v1",dbFile));
-        this.AddFileToProject(projectLocation,@"Resources\Database\v1",dbFile, string.Empty);
+        System.IO.FileInfo fi = new System.IO.FileInfo(sourceFilePath);
+        
+        File.Copy(fi.FullName, Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias,"Resources","Database","v1",fi.Name));
+        this.AddFileToProject(projectLocation,@"Resources\Database\v1",fi.Name, string.Empty);
   	}
     
     this.BuildCurrentTableTemplate(this.Create<Common_ClaimsIdentity>(),projectLocation,"Common",this.SolutionName + "ClaimsIdentity.cs", string.Empty);
