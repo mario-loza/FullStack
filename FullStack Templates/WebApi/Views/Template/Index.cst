@@ -1,0 +1,43 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\..\Common\HeaderInclude.cst" -->
+@model IEnumerable<<%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models.<%=this.GetModelClassName(this.CurrentTable) %>>
+
+@{
+    ViewBag.Title = "Index of <% = this.CurrentTable.Name %>";
+}
+
+<h2><% = this.CurrentTable.Name %></h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+       <% for (int i = 0; i < CurrentTable.NonPrimaryKeyColumns.Count; i++) { 
+            string propertyName = GetPropertyName(CurrentTable.NonPrimaryKeyColumns[i]);
+       %>
+		 <th>
+            @Html.DisplayNameFor(model => model.<% = propertyName %>)
+        </th>
+        <% } %>
+       <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+     <% for (int i = 0; i < CurrentTable.NonPrimaryKeyColumns.Count; i++) { 
+            string propertyName = GetPropertyName(CurrentTable.NonPrimaryKeyColumns[i]);
+       %>
+		 <td>
+            @Html.DisplayFor(modelItem => item.<% = propertyName %>)
+        </td>
+        <% } %>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

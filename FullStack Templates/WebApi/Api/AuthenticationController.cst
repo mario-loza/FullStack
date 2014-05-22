@@ -1,6 +1,6 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
 <!-- #include file="..\..\Common\HeaderInclude.cst" -->
-namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
 {
     using System;
     using System.Collections.Generic;
@@ -17,16 +17,10 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;     
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services;
     
-     <% if (this.RenderBody) 
-     { %>
-    [<%= this.SolutionName %>AuthenticationFilter(false)]
-    <% } %>
-    public partial class <%= this.GetClassName("Authentication") %>Controller <% this.RenderBodyWrite(": ApiController",string.Empty); %>
+     [<%= this.SolutionName %>AuthenticationFilter(false)]
+   public partial class <%= this.GetClassName("Authentication") %>Controller : ApiController
     {
-        <% if (this.RenderBody) 
-        { // START RENDERBODY
-        %>
-            public I<%= this.GetManagerClassName("Authentication") %> ManagerService { get; set; }
+              public I<%= this.GetManagerClassName("Authentication") %> ManagerService { get; set; }
             
             public <%= this.GetClassName("Authentication") %>Controller()
             {
@@ -84,8 +78,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
                 }
                 return this.Json(new ApiResponse<<%= this.GetModelClassName("AuthorizationToken") %>>(token));
             }
-       <% } // END RENDERBODY %>       
-    }
+     }
 }
 <script runat="template">
 

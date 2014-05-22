@@ -1,0 +1,38 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\..\Common\HeaderInclude.cst" -->
+@model <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models.<%=this.GetModelClassName(this.CurrentTable) %>
+
+@{
+    ViewBag.Title = "Delete <% = this.CurrentTable.Name %>";
+}
+
+<h2>Delete <% = this.CurrentTable.Name %></h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4><%=this.GetModelClassName(this.CurrentTable) %></h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <% for (int i = 0; i < CurrentTable.NonPrimaryKeyColumns.Count; i++) { 
+            string propertyName = GetPropertyName(CurrentTable.NonPrimaryKeyColumns[i]);
+        %>
+		<dt>
+            @Html.DisplayNameFor(model => model.<% = propertyName %>)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.<% = propertyName %>)
+        </dd>
+        
+        <% } %>        
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

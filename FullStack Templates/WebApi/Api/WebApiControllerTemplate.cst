@@ -1,6 +1,6 @@
 ﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
 <!-- #include file="..\..\Common\HeaderInclude.cst" -->
-namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Api
 {
     using System;
     using System.Collections.Generic;
@@ -17,16 +17,10 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;     
     using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services;
     
-    <% if (this.RenderBody) 
-    { %>
     [<%= this.SolutionName %>AuthenticationFilter()]
-    <% } %>
-    public partial class <%= CurrentTable.Name %>Controller <% this.RenderBodyWrite(": ApiController",string.Empty); %>
+    public partial class <%= CurrentTable.Name %>Controller : ApiController
     {
-        <% if (this.RenderBody) 
-        { // START RENDERBODY
-        %>
-            public I<%= this.GetManagerClassName(CurrentTable) %> ManagerService { get; set; }
+         public I<%= this.GetManagerClassName(CurrentTable) %> ManagerService { get; set; }
             
             public <%= CurrentTable.Name %>Controller()
             {
@@ -130,7 +124,7 @@ namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
                 
                 return response;
             }
-       <% } // END RENDERBODY %>       
+        
     }
 }
 <script runat="template">

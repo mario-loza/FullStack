@@ -2,10 +2,17 @@
 <!-- #include file="..\Common\HeaderInclude.cst" -->
 <%@ Register Name="ProjectTemplate" Template="../Resources/EmptyAspNetProject.cst" %>
 <%@ Register Name="AssemblyInfoTemplate" Template="../Resources/AssemblyInfoTemplate.cst" %>
-<%@ Register Name="ControllerTemplate" Template="Controllers/WebApiControllerTemplate.cst" %>
+<%@ Register Name="ApiControllerTemplate" Template="Api/WebApiControllerTemplate.cst" %>
+<%@ Register Name="ClassControllerTemplate" Template="Controllers/ClassControllerTemplate.cst" %>
 <%@ Register Name="HomeControllerTemplate" Template="Controllers/HomeController.cst" %>
 <%@ Register Name="ValuesControllerTemplate" Template="Controllers/ValuesController.cst" %>
-<%@ Register Name="AuthenticationControllerTemplate" Template="Controllers/AuthenticationController.cst" %>
+<%@ Register Name="AuthenticationControllerTemplate" Template="Api/AuthenticationController.cst" %>
+
+<%@ Register Name="ViewCreateTemplate" Template="Views/Template/Create.cst" %>
+<%@ Register Name="ViewDeleteTemplate" Template="Views/Template/Delete.cst" %>
+<%@ Register Name="ViewDetailsTemplate" Template="Views/Template/Details.cst" %>
+<%@ Register Name="ViewEditTemplate" Template="Views/Template/Edit.cst" %>
+<%@ Register Name="ViewIndexTemplate" Template="Views/Template/Index.cst" %>
 
 <%@ Register Name="ViewsWebConfigTemplate" Template="Views/Web.config.cst" %>
 
@@ -35,6 +42,7 @@ public override void Render(TextWriter writer)
     this.ClearDirectory(Path.Combine(this.OutputDirectory,this.SolutionName,this.CurrentProjectAlias));
     this.ClearDirectory(GetProjectOutputDirectory("App_Data"));
     this.ClearDirectory(GetProjectOutputDirectory("App_Start"));
+    this.ClearDirectory(GetProjectOutputDirectory("Api"));
     this.ClearDirectory(GetProjectOutputDirectory("Areas"));
     this.ClearDirectory(GetProjectOutputDirectory("Content"));
     this.ClearDirectory(GetProjectOutputDirectory("Controllers"));
@@ -83,7 +91,7 @@ public override void Render(TextWriter writer)
         this.RenderTemplateToFile(this.Create<AppStartRouteConfigTemplate>(), GetProjectOutputDirectory("App_Start","RouteConfig.cs"));
         this.RenderTemplateToFile(this.Create<AppStartWebApiConfigTemplate>(), GetProjectOutputDirectory("App_Start","WebApiConfig.cs"));
         
-        this.BuildCurrentTableTemplate(this.Create<AuthenticationControllerTemplate>(),projectLocation,"Controllers","AuthenticationController.gen.cs", "AuthenticationController.cs");
+        this.BuildCurrentTableTemplate(this.Create<AuthenticationControllerTemplate>(),projectLocation,"Api","AuthenticationController.cs", string.Empty);
 
         this.BuildCurrentTableTemplate(this.Create<BasicAuthenticationFilterTemplate>(),projectLocation,"Filters", this.SolutionName + "AuthenticationFilterAttribute.cs", string.Empty);
         
@@ -102,11 +110,19 @@ public override void Render(TextWriter writer)
         this.CurrentTable = table;
         _currentTableCount++;
      
+        this.ClearDirectory(GetProjectOutputDirectory("Views", this.CurrentTable.Name));
         if (this.HasValidPrimaryKey(this.CurrentTable))
         {
             _currentStep = 1;
              
-            this.BuildCurrentTableTemplate(this.Create<ControllerTemplate>(), projectLocation,"Controllers",string.Format("{0}Controller.gen.cs", this.CurrentTable.Name),string.Format("{0}Controller.cs", this.CurrentTable.Name));            
+            this.BuildCurrentTableTemplate(this.Create<ApiControllerTemplate>(), projectLocation,"Api",string.Format("{0}Controller.cs", this.CurrentTable.Name),string.Empty);
+            this.BuildCurrentTableTemplate(this.Create<ClassControllerTemplate>(), projectLocation,"Controllers",string.Format("{0}Controller.cs", this.CurrentTable.Name),string.Empty);
+            
+            this.BuildCurrentTableTemplate(this.Create<ViewCreateTemplate>(), projectLocation,Path.Combine("Views",this.CurrentTable.Name),string.Format("Create.cshtml", this.CurrentTable.Name),string.Empty);
+            this.BuildCurrentTableTemplate(this.Create<ViewDeleteTemplate>(), projectLocation,Path.Combine("Views",this.CurrentTable.Name),string.Format("Delete.cshtml", this.CurrentTable.Name),string.Empty);
+            this.BuildCurrentTableTemplate(this.Create<ViewDetailsTemplate>(), projectLocation,Path.Combine("Views",this.CurrentTable.Name),string.Format("Details.cshtml", this.CurrentTable.Name),string.Empty);
+            this.BuildCurrentTableTemplate(this.Create<ViewEditTemplate>(), projectLocation,Path.Combine("Views",this.CurrentTable.Name),string.Format("Edit.cshtml", this.CurrentTable.Name),string.Empty);
+            this.BuildCurrentTableTemplate(this.Create<ViewIndexTemplate>(), projectLocation,Path.Combine("Views",this.CurrentTable.Name),string.Format("Index.cshtml", this.CurrentTable.Name),string.Empty);
         }
     }
     

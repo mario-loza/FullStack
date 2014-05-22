@@ -1,0 +1,33 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\..\Common\HeaderInclude.cst" -->
+@model <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models.<%=this.GetModelClassName(this.CurrentTable) %>
+
+
+@{
+    ViewBag.Title = "Details for <% = this.CurrentTable.Name %>";
+}
+
+<h2>Details for <% = this.CurrentTable.Name %></h2>
+
+<div>
+    <h4><%=this.GetModelClassName(this.CurrentTable) %></h4>
+    <hr />
+    <dl class="dl-horizontal">
+         <% for (int i = 0; i < CurrentTable.NonPrimaryKeyColumns.Count; i++) { 
+        string propertyName = GetPropertyName(CurrentTable.NonPrimaryKeyColumns[i]);
+       %>
+		 <dt>
+            @Html.DisplayNameFor(model => model.<%= propertyName %>)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.<%= propertyName %>)
+        </dd>
+        
+        <% } %>        
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

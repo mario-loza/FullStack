@@ -1,0 +1,105 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\Common\HeaderInclude.cst" -->
+namespace <%= this.SolutionName %>.<%= this.CurrentProjectAlias %>.Controllers
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Web;
+    using System.Web.Mvc;
+     
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Models;     
+    using <%= this.SolutionName %>.<%= this.StackProjects["Engine"].Alias %>.Services;
+
+    public class <%= this.CurrentTable.Name %>Controller : Controller
+    {
+        // GET: <%= this.CurrentTable.Name %>
+        public ActionResult Index()
+        {
+            <%= GetManagerClassName(this.CurrentTable) %> manager = new <%= GetManagerClassName(this.CurrentTable) %>();
+            var models = manager.Read();
+            return View(models);
+        }
+
+        // GET: <%= this.CurrentTable.Name %>/Details/5
+        public ActionResult Details(int id)
+        {
+            <%= GetManagerClassName(this.CurrentTable) %> manager = new <%= GetManagerClassName(this.CurrentTable) %>();
+            var model = manager.Read(id);
+            return View(model);
+        }
+
+        // GET: <%= this.CurrentTable.Name %>/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: <%= this.CurrentTable.Name %>/Create
+        [HttpPost]
+        public ActionResult Create(FormCollection collection)
+        {
+            try
+            {
+                // TODO: Add insert logic here
+
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: <%= this.CurrentTable.Name %>/Edit/5
+        public ActionResult Edit(int id)
+        {   
+            <%= GetManagerClassName(this.CurrentTable) %> manager = new <%= GetManagerClassName(this.CurrentTable) %>();
+            var model = manager.Read(id);
+            return View(model);
+        }
+
+        // POST: <%= this.CurrentTable.Name %>/Edit/5
+        [HttpPost]
+        public ActionResult Edit(int id, FormCollection collection)
+        {
+            try
+            {
+                 <%= GetManagerClassName(this.CurrentTable) %> manager = new <%= GetManagerClassName(this.CurrentTable) %>();
+                var model = manager.Read(id);
+                // TODO: Add update logic here
+
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: <%= this.CurrentTable.Name %>/Delete/5
+        public ActionResult Delete(int id)
+        {
+            <%= GetManagerClassName(this.CurrentTable) %> manager = new <%= GetManagerClassName(this.CurrentTable) %>();
+            var model = manager.Read(id);
+            return View(model);
+        }
+
+        // POST: <%= this.CurrentTable.Name %>/Delete/5
+        [HttpPost]
+        public ActionResult Delete(int id, FormCollection collection)
+        {
+            try
+            {
+                // TODO: Add delete logic here
+                <%= GetManagerClassName(this.CurrentTable) %> manager = new <%= GetManagerClassName(this.CurrentTable) %>();
+                var model = manager.Read(id);
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+    }
+}

@@ -224,11 +224,15 @@ namespace FullStack.Common
         public void AddFileToProject(string projectPath, string projectSubDir, string file, string parent)
         {
              string modifier = "Compile";
-            if (file.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".sql", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".xml", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase)){
+            if (file.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".sql", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".xml", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".cshtml", StringComparison.InvariantCultureIgnoreCase)){
                 modifier = "None";
                 if (projectSubDir.StartsWith(@"Resources", StringComparison.InvariantCultureIgnoreCase))
                 {
                     modifier = "EmbeddedResource";
+                } 
+                else if (file.EndsWith(".cshtml", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    modifier = "Content";    
                 }
             }
             
