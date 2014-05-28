@@ -1,0 +1,160 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="Text" Src="..\..\..\Common\MasterTemplate.cs" Inherits="FullStack.Common.MasterTemplate" Description="Generates a set of HTML-based database documentation." OutputType="None" %>
+<!-- #include file="..\..\..\Common\HeaderInclude.cst" -->
+/// <reference path="../typings/jquery/jquery.d.ts"/>
+
+/* tslint:disable */
+
+declare module ToDoloo {
+    export class Model {
+        constructor(attr?, opts?);
+        get(name: string): any;
+        set(name: string, val: any): void;
+        set(obj: any): void;
+        save(attr?, opts?): void;
+        destroy(): void;
+        bind(ev: string, f: Function, ctx?: any): void;
+        toJSON(): any;
+    }
+    export class Collection<T> {
+        constructor(models?, opts?);
+        bind(ev: string, f: Function, ctx?: any): void;
+        length: number;
+        create(attrs, opts?): any;
+        each(f: (elem: T) => void): void;
+        fetch(opts?: any): void;
+        last(): T;
+        last(n: number): T[];
+        filter(f: (elem: T) => boolean): T[];
+        without(...values: T[]): T[];
+    }
+
+}
+
+class ApiBase {
+    url: string;
+    identifier: string;
+    
+    constructor(theUrl: string, theIdentifier: string) {
+        this.url = theUrl;
+        this.identifier = theIdentifier;
+        
+        if (!this.endsWith(this.url,'/')) {
+            this.url += '/';
+        }
+        jQuery.support.cors = true;        
+    }
+
+    endsWith(value: string, suffix: string) {
+        return value.indexOf(suffix, value.length - suffix.length) !== -1;
+    }
+    stringFormat(input: string, args: Array<any>) {
+        if (args == null) {
+            return input;
+        }
+        return input.replace(/{(\d+)}/g, function (match, number) {
+            return typeof args[number] != 'undefined'
+                ? args[number]
+                : match
+                ;
+        });
+    }
+    
+    formatEndpoint(endpoint: string) {
+        return this.url + 'api/' + endpoint;
+    }
+    
+    delete(formattedEndpoint: string, args: Array<any>) {
+        var endpoint: string = this.stringFormat(formattedEndpoint, args);
+        
+    }
+
+    get(formattedEndpoint: string, args: Array<any>) {
+        var endpoint: string = this.stringFormat(formattedEndpoint, args);
+        
+        var endpointToCall: string = this.formatEndpoint(endpoint);
+        var tok = 'webapi:'+this.identifier;
+        var hash = btoa(tok);
+        
+         $.ajax({
+            url: endpointToCall,
+            type: 'GET',
+            data:null,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Basic " + hash);
+            },
+            contentType: "application/json;charset=utf-8",
+            success: (data) => {
+                //debugger;
+                alert(JSON.stringify(data));
+            },
+            error: (x, y, z) => {
+                alert(x + '\n' + y + '\n' + z);
+            }
+        });
+    }
+
+    writeResponse(data: any) {
+        alert(data);    
+    }
+
+    post(formattedEndpoint: string, args: Array<any>, model : any)  {
+        var endpoint: string = this.stringFormat(formattedEndpoint, args);
+    }
+
+    put(formattedEndpoint: string, args: Array<any>, model : any) {
+        var endpoint: string = this.stringFormat(formattedEndpoint, args);
+    }
+}
+
+<%  foreach(TableSchema table in this.SourceDatabase.Tables)
+    { %>
+class <% =GetClassName(table) %>Api extends ApiBase {
+    constructor(theUrl: string, theIdentifier: string) {
+        super(theUrl, theIdentifier);
+    }
+
+    getAll<%= table.Name %>() {
+       return super.get('<%= table.Name %>/',null);
+    }
+    
+    get<% =GetClassName(table) %>(id : number) {
+        var args: Array<any> = new Array<any>();
+        args.push(id);
+        
+        return super.get('<%= table.Name %>/{0}',args);
+    }
+    create<% =GetClassName(table) %>(model : <% =GetClassName(table) %>Model) {
+        return super.post('<%= table.Name %>/',null, model);
+    }
+    delete<% =GetClassName(table) %>(id : number) {
+        var args: Array<any> = new Array<any>();
+        args.push(id);
+        
+        return super.delete('<%= table.Name %>/{0}',args);
+    }
+    
+    update<% =GetClassName(table) %>(id : number, model : <% =GetClassName(table) %>Model) {
+        var args: Array<any> = new Array<any>();
+        args.push(id);
+        
+        return super.put('<%= table.Name %>/{0}',args, model);
+    }
+}
+<% } // END LOOPING THROUGH TABLES %>
+
+class <%= SolutionName %>Api extends ApiBase {
+     <%  foreach(TableSchema table in this.SourceDatabase.Tables)
+    { %>
+        <% =CamelCase(GetClassName(table)) %>Api: <% =GetClassName(table) %>Api;
+    <% } // END LOOPING THROUGH TABLES %>
+    
+    constructor(theUrl: string, theIdentifier: string) {
+        super(theUrl, theIdentifier);
+        
+    <%  foreach(TableSchema table in this.SourceDatabase.Tables)
+    { %>
+        this.<% =CamelCase(GetClassName(table)) %>Api = new <% =GetClassName(table) %>Api(theUrl, theIdentifier);
+    <% } // END LOOPING THROUGH TABLES %>
+    
+    }   
+}

@@ -1,16 +1,15 @@
-﻿﻿using System;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.ComponentModel;
-using System.ComponentModel.Design;
+using System.IO;
 using System.Linq;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using System.Xml;
 using System.Reflection;
-using System.Collections.Generic;
+using System.Xml.Linq;
+
 using CodeSmith.Engine;
+
 using SchemaExplorer;
 
 namespace FullStack.Common
@@ -33,6 +32,8 @@ namespace FullStack.Common
 
         public MapCollection SqlNativeSqlDb = Map.LoadFromName("SqlNativeType-SqlDbType"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
 
+        public MapCollection DbTypeTypeScript = Map.LoadFromName("DbType-TypeScript"); //new MapCollection("../../Maps/System-CSharpAlias.csmap");
+
         private string _outputDirectory = String.Empty;
 
         #endregion
@@ -41,8 +42,9 @@ namespace FullStack.Common
 
         public MasterTemplate()
             : base()
-        {
-        }
+        {       
+            
+         }
 
         #endregion
 
@@ -56,6 +58,7 @@ namespace FullStack.Common
             }
         }
         
+          
         [Category("Context")]
         [Description("Url to use when assigning claims, such as 'MySite.com' or 'YourSite.com'")]
         public string BaseUrl { get; set; }
@@ -223,8 +226,9 @@ namespace FullStack.Common
         /// </param>
         public void AddFileToProject(string projectPath, string projectSubDir, string file, string parent)
         {
-             string modifier = "Compile";
-            if (file.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".sql", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".xml", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".cshtml", StringComparison.InvariantCultureIgnoreCase)){
+            string modifier = "Compile";
+            if (file.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".sql", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".xml", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase) || file.EndsWith(".cshtml", StringComparison.InvariantCultureIgnoreCase))
+            {
                 modifier = "None";
                 if (projectSubDir.StartsWith(@"Resources", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -236,6 +240,11 @@ namespace FullStack.Common
                 }
             }
             
+            if (file.EndsWith(".ts", StringComparison.InvariantCultureIgnoreCase))
+            {
+                modifier = "TypeScriptCompile";
+            }
+             
             XDocument proj = XDocument.Load(projectPath);
 
             XNamespace ns = "http://schemas.microsoft.com/developer/msbuild/2003";
@@ -325,7 +334,12 @@ namespace FullStack.Common
                 this.AddFileToProject(projectLocation, subFolderPath, string.Format(generatedFileNameFormat, this.GetClassName(this.CurrentTable)), string.Empty);
             }
         }
-
+        
+        public string CamelCase(string value)
+        {
+            return Char.ToLowerInvariant(value[0]) + value.Substring(1);
+        }
+        
         public void CleanupProjectFile(string projectPath)
         {
             XDocument proj = XDocument.Load(projectPath);
@@ -459,6 +473,27 @@ namespace FullStack.Common
             }
 
             return this.DbTypeCSharp[column.DataType.ToString()];
+        }
+        
+        public string GetTypeScriptVariableType(ColumnSchema column)
+        {
+            try
+            {
+                if (column.Name.EndsWith("TypeCode"))
+                {
+                    return column.Name;
+                }
+                if (column.SystemType.Name.Contains("[]"))
+                {
+                    string columnType = column.SystemType.Name.Replace("[]",string.Empty);
+                    return String.Format("Array<{0}>",DbTypeTypeScript[columnType]);
+                }
+                return DbTypeTypeScript[column.SystemType.Name];
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Could not find: {0}, {1}", column.SystemType.Name, column.SystemType.FullName), ex);   
+            }
         }
 
         public string GetCamelCaseName(string value)
@@ -636,6 +671,29 @@ namespace FullStack.Common
                 if (table.PrimaryKey.MemberColumns.Count == 1)
                 {
                     return this.GetCSharpVariableType(table.PrimaryKey.MemberColumns[0]);
+                }
+                else
+                {
+                    string columns = string.Empty;
+
+                    columns = String.Join(",", table.PrimaryKey.MemberColumns.Select(m => m.Name));
+
+                    throw new ApplicationException(string.Format("This template will not work on the table {0} because it has primary keys with more than one member column: {1}", table.Name, columns));
+                }
+            }
+            else
+            {
+                throw new ApplicationException(string.Format("Error parsing the table [{0}]. This template will only work on tables with a primary key.", table.Name));
+            }
+        }
+        
+        public string GetPrimaryKeyTypeScriptType(TableSchema table)
+        {
+            if (table.PrimaryKey != null)
+            {
+                if (table.PrimaryKey.MemberColumns.Count == 1)
+                {
+                    return this.GetTypeScriptVariableType(table.PrimaryKey.MemberColumns[0]);
                 }
                 else
                 {

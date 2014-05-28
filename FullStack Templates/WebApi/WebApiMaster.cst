@@ -8,6 +8,9 @@
 <%@ Register Name="ValuesControllerTemplate" Template="Controllers/ValuesController.cst" %>
 <%@ Register Name="AuthenticationControllerTemplate" Template="Api/AuthenticationController.cst" %>
 
+<%@ Register Name="TsApiTemplate" Template="Scripts/api/api.ts.cst" %>
+<%@ Register Name="TsApiModelsTemplate" Template="Scripts/typings/apimodels/apimodel.ts.cst" %>
+
 <%@ Register Name="ViewCreateTemplate" Template="Views/Template/Create.cst" %>
 <%@ Register Name="ViewDeleteTemplate" Template="Views/Template/Delete.cst" %>
 <%@ Register Name="ViewDetailsTemplate" Template="Views/Template/Details.cst" %>
@@ -50,6 +53,11 @@ public override void Render(TextWriter writer)
     this.ClearDirectory(GetProjectOutputDirectory("fonts"));
     this.ClearDirectory(GetProjectOutputDirectory("Models"));
     this.ClearDirectory(GetProjectOutputDirectory("Scripts"));
+    this.ClearDirectory(GetProjectOutputDirectory(Path.Combine("Scripts", "api")));
+    this.ClearDirectory(GetProjectOutputDirectory(Path.Combine("Scripts", "typings")));
+    this.ClearDirectory(GetProjectOutputDirectory(Path.Combine("Scripts", "typings", "angularjs")));
+    this.ClearDirectory(GetProjectOutputDirectory(Path.Combine("Scripts", "typings", "jquery")));
+    this.ClearDirectory(GetProjectOutputDirectory(Path.Combine("Scripts", "typings", "apimodels")));
     this.ClearDirectory(GetProjectOutputDirectory("Views"));
     this.ClearDirectory(GetProjectOutputDirectory("Views", "Home"));
     this.ClearDirectory(GetProjectOutputDirectory("Views", "Shared"));
@@ -70,6 +78,8 @@ public override void Render(TextWriter writer)
         //Copy the non-template file
         this.CopyNonTemplateFilesToFolder("Root",string.Empty);                
         this.CopyNonTemplateFilesToFolder("Scripts", "Scripts");
+        this.CopyNonTemplateFilesToFolder(@"Scripts\typings\angularjs", @"Scripts\typings\angularjs");
+        this.CopyNonTemplateFilesToFolder(@"Scripts\typings\jquery", @"Scripts\typings\jquery");
         this.CopyNonTemplateFilesToFolder("fonts", "fonts");
         this.CopyNonTemplateFilesToFolder("Content", "Content");
         this.CopyNonTemplateFilesToFolder("Views", "Views");
@@ -85,6 +95,8 @@ public override void Render(TextWriter writer)
         this.RenderTemplateToFile(this.Create<ValuesControllerTemplate>(), GetProjectOutputDirectory("Controllers","ValuesController.cs"));
         
         this.RenderTemplateToFile(this.Create<ViewsWebConfigTemplate>(), GetProjectOutputDirectory("Views","Web.config"));
+        
+        this.BuildCurrentTableTemplate(this.Create<TsApiTemplate>(),projectLocation,Path.Combine("Scripts","api"),"api.ts", string.Empty);
         
         this.RenderTemplateToFile(this.Create<AppStartBundleConfigTemplate>(), GetProjectOutputDirectory("App_Start","BundleConfig.cs"));
         this.RenderTemplateToFile(this.Create<AppStartFilterConfigTemplate>(), GetProjectOutputDirectory("App_Start","FilterConfig.cs"));
@@ -123,6 +135,9 @@ public override void Render(TextWriter writer)
             this.BuildCurrentTableTemplate(this.Create<ViewDetailsTemplate>(), projectLocation,Path.Combine("Views",this.CurrentTable.Name),string.Format("Details.cshtml", this.CurrentTable.Name),string.Empty);
             this.BuildCurrentTableTemplate(this.Create<ViewEditTemplate>(), projectLocation,Path.Combine("Views",this.CurrentTable.Name),string.Format("Edit.cshtml", this.CurrentTable.Name),string.Empty);
             this.BuildCurrentTableTemplate(this.Create<ViewIndexTemplate>(), projectLocation,Path.Combine("Views",this.CurrentTable.Name),string.Format("Index.cshtml", this.CurrentTable.Name),string.Empty);
+            
+             this.BuildCurrentTableTemplate(this.Create<TsApiModelsTemplate>(), projectLocation,Path.Combine("Scripts","typings","apimodels"),string.Format("{0}model.d.ts", this.CurrentTable.Name),string.Empty);
+           
         }
     }
     
